@@ -20,20 +20,22 @@ infraestrutura que todas as telas e integrações vão precisar, antes de
 começar a construir qualquer funcionalidade.
 
 **Entregas:**
-- [ ] Adicionar os componentes shadcn/ui que faltam: `form`, `checkbox`,
+- [x] Adicionar os componentes shadcn/ui que faltam: `form`, `checkbox`,
       `popover`, `calendar`, `sonner` (toast), `tooltip`, `command`,
-      `switch`, `sidebar`, `chart`, `progress`
-- [ ] Configurar `<Toaster />` (sonner) no layout raiz — necessário para os
+      `switch`, `sidebar`, `chart`, `progress` — no estilo `base-nova` o
+      `form` foi substituído pelo `field`, que já existia no scaffold
+- [x] Configurar `<Toaster />` (sonner) no layout raiz — necessário para os
       toasts de sucesso/erro da Seção 9.5 do PRD
-- [ ] Criar `.env.example` documentando todas as variáveis necessárias
+- [x] Criar `.env.example` documentando todas as variáveis necessárias
       (Supabase URL/publishable key/service role, Resend API key, Stripe
       publishable/secret/webhook secret, URL pública do site)
-- [ ] Criar client Supabase com service role (`src/lib/supabase/admin.ts`) —
+- [x] Criar client Supabase com service role (`src/lib/supabase/admin.ts`) —
       só usado em Server Actions/Route Handlers no servidor, nunca exposto
-      ao client (regra inegociável do CLAUDE.md)
-- [ ] Criar placeholder de tipos do banco (`src/lib/supabase/database.types.ts`),
+      ao client (regra inegociável do CLAUDE.md); protegido com o pacote
+      `server-only`, que quebra o build se importado em código cliente
+- [x] Criar placeholder de tipos do banco (`src/lib/supabase/database.types.ts`),
       a ser substituído pelos tipos reais no M8
-- [ ] Corrigir o link de navegação em `src/app/layout.tsx` de `/contatos`
+- [x] Corrigir o link de navegação em `src/app/layout.tsx` de `/contatos`
       para `/leads`, alinhando com o PRD
 
 **Commit final:** `chore: setup de ambiente, componentes shadcn e fundação técnica`
