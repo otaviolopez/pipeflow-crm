@@ -1,0 +1,13 @@
+# Configuração do gitleaks (scanner de segredos).
+# Estende as regras padrão e adiciona exceções específicas deste repositório.
+
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Hashes `integrity` (sha512/base64) do lockfile não são segredos"
+paths = ['''package-lock\.json''']
+
+[[allowlists]]
+description = "Placeholders documentados de variáveis de ambiente"
+paths = ['''\.env\.example''']

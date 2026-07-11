@@ -1,0 +1,16 @@
+# Scanner de segredos: bloqueia o commit se detectar credenciais no staged.
+# Requer gitleaks instalado: winget install Gitleaks.Gitleaks
+# (fallback para o caminho padrão do winget caso o PATH ainda não tenha sido recarregado)
+
+WINGET_GITLEAKS="$LOCALAPPDATA/Microsoft/WinGet/Packages/Gitleaks.Gitleaks_Microsoft.Winget.Source_8wekyb3d8bbwe/gitleaks.exe"
+
+if command -v gitleaks >/dev/null 2>&1; then
+  GITLEAKS=gitleaks
+elif [ -x "$WINGET_GITLEAKS" ]; then
+  GITLEAKS="$WINGET_GITLEAKS"
+else
+  echo "ERRO: gitleaks nao encontrado. Instale com: winget install Gitleaks.Gitleaks" >&2
+  exit 1
+fi
+
+"$GITLEAKS" git --pre-commit --staged --redact --no-banner
