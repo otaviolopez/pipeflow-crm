@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { logout } from "@/app/login/actions";
+import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -38,7 +39,7 @@ export default async function RootLayout({
         {isLoggedIn && (
           <header className="flex items-center justify-between border-b px-6 py-3">
             <nav className="flex gap-4 text-sm font-medium">
-              <Link href="/contatos">Contatos</Link>
+              <Link href="/leads">Leads</Link>
               <Link href="/pipeline">Pipeline</Link>
             </nav>
             <form action={logout}>
@@ -49,6 +50,7 @@ export default async function RootLayout({
           </header>
         )}
         <div className="flex-1">{children}</div>
+        <Toaster />
       </body>
     </html>
   );
