@@ -172,12 +172,12 @@ dados mockados.
 6.7), ambas com dados mockados/estáticos.
 
 **Entregas:**
-- [ ] `/dashboard`: 4 KPI cards (Total de leads, Negócios abertos, Valor
+- [x] `/dashboard`: 4 KPI cards (Total de leads, Negócios abertos, Valor
       total do pipeline, Taxa de conversão) com número em destaque 2-3x
       maior que o label
-- [ ] Gráfico de funil de vendas por etapa (Recharts + shadcn `chart`)
-- [ ] Lista "Meus negócios com prazo próximo" (7 dias)
-- [ ] `/` landing page pública: Hero, Funcionalidades, Planos e Preços, CTA
+- [x] Gráfico de funil de vendas por etapa (Recharts + shadcn `chart`)
+- [x] Lista "Meus negócios com prazo próximo" (7 dias)
+- [x] `/` landing page pública: Hero, Funcionalidades, Planos e Preços, CTA
       de cadastro
 
 **Commit final:** `feat(ui): dashboard de métricas e landing page pública`
