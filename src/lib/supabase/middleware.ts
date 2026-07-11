@@ -29,7 +29,9 @@ export async function updateSession(request: NextRequest) {
   const { data } = await supabase.auth.getClaims();
   const isLoggedIn = !!data?.claims;
 
-  const isAuthRoute = request.nextUrl.pathname.startsWith("/login");
+  const isAuthRoute =
+    request.nextUrl.pathname.startsWith("/login") ||
+    request.nextUrl.pathname.startsWith("/signup");
 
   // Rotas autenticadas conforme CLAUDE.md — só estas exigem sessão. "/" é a
   // landing page pública (PRD, Seção 9.1) e não deve ser bloqueada aqui.

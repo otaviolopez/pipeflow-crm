@@ -106,13 +106,13 @@ onboarding e a página pública de aceite de convite — Seção 9.1 e Fluxos 1 
 3 do PRD.
 
 **Entregas:**
-- [ ] `/login`: só o formulário de entrada
-- [ ] `/signup`: só o formulário de cadastro
-- [ ] Mensagem de erro genérica "E-mail ou senha incorretos" (Seção 9.5) —
+- [x] `/login`: só o formulário de entrada
+- [x] `/signup`: só o formulário de cadastro
+- [x] Mensagem de erro genérica "E-mail ou senha incorretos" (Seção 9.5) —
       nunca revelar qual campo está errado
-- [ ] `/onboarding`: wizard passo 1 (nome do workspace) + passo 2 opcional
+- [x] `/onboarding`: wizard passo 1 (nome do workspace) + passo 2 opcional
       (convidar colaboradores, pode pular) — sem sidebar ainda
-- [ ] `/invite/[token]`: tela de aceite de convite (criar conta ou logar,
+- [x] `/invite/[token]`: tela de aceite de convite (criar conta ou logar,
       mockado)
 
 **Commit final:** `feat(ui): telas de login, signup, onboarding e aceite de convite`
