@@ -3,32 +3,32 @@ import Link from "next/link";
 
 import { AuthShell } from "@/components/auth-shell";
 import { Button } from "@/components/ui/button";
-import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
+import { Field, FieldDescription, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 
-import { login } from "./actions";
+import { signup } from "./actions";
 
-export const metadata: Metadata = { title: "Entrar — PiperFlow" };
+export const metadata: Metadata = { title: "Criar conta — PiperFlow" };
 
-export default async function LoginPage({
+export default async function SignupPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string; notice?: string }>;
+  searchParams: Promise<{ error?: string }>;
 }) {
-  const { error, notice } = await searchParams;
+  const { error } = await searchParams;
 
   return (
     <AuthShell
-      title="Entrar"
-      description="Acesse sua conta para continuar."
+      title="Criar conta"
+      description="Comece a organizar suas vendas em poucos minutos."
       footer={
         <p className="text-sm text-muted-foreground">
-          Não tem uma conta?{" "}
+          Já tem uma conta?{" "}
           <Link
-            href="/signup"
+            href="/login"
             className="font-medium text-foreground underline underline-offset-4"
           >
-            Criar conta
+            Entrar
           </Link>
         </p>
       }
@@ -40,14 +40,6 @@ export default async function LoginPage({
             className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive"
           >
             {error}
-          </p>
-        )}
-        {notice && (
-          <p
-            role="status"
-            className="rounded-md bg-accent px-3 py-2 text-sm text-accent-foreground"
-          >
-            {notice}
           </p>
         )}
 
@@ -68,13 +60,14 @@ export default async function LoginPage({
               id="password"
               name="password"
               type="password"
-              autoComplete="current-password"
+              autoComplete="new-password"
               minLength={6}
               required
             />
+            <FieldDescription>Mínimo de 6 caracteres.</FieldDescription>
           </Field>
-          <Button type="submit" formAction={login} className="mt-1 w-full">
-            Entrar
+          <Button type="submit" formAction={signup} className="mt-1 w-full">
+            Criar conta
           </Button>
         </FieldGroup>
       </form>

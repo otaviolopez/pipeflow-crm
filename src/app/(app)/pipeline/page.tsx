@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
-import { PagePlaceholder } from "@/components/page-placeholder";
+
+import { PipelineBoard } from "@/components/pipeline/pipeline-board";
 
 export const metadata: Metadata = { title: "Pipeline — PiperFlow" };
 
 export default function PipelinePage() {
-  return <PagePlaceholder title="Pipeline" milestone="M4" />;
+  return <PipelineBoard />;
 }

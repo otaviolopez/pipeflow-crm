@@ -106,13 +106,13 @@ onboarding e a página pública de aceite de convite — Seção 9.1 e Fluxos 1 
 3 do PRD.
 
 **Entregas:**
-- [ ] `/login`: só o formulário de entrada
-- [ ] `/signup`: só o formulário de cadastro
-- [ ] Mensagem de erro genérica "E-mail ou senha incorretos" (Seção 9.5) —
+- [x] `/login`: só o formulário de entrada
+- [x] `/signup`: só o formulário de cadastro
+- [x] Mensagem de erro genérica "E-mail ou senha incorretos" (Seção 9.5) —
       nunca revelar qual campo está errado
-- [ ] `/onboarding`: wizard passo 1 (nome do workspace) + passo 2 opcional
+- [x] `/onboarding`: wizard passo 1 (nome do workspace) + passo 2 opcional
       (convidar colaboradores, pode pular) — sem sidebar ainda
-- [ ] `/invite/[token]`: tela de aceite de convite (criar conta ou logar,
+- [x] `/invite/[token]`: tela de aceite de convite (criar conta ou logar,
       mockado)
 
 **Commit final:** `feat(ui): telas de login, signup, onboarding e aceite de convite`
@@ -126,16 +126,16 @@ onboarding e a página pública de aceite de convite — Seção 9.1 e Fluxos 1 
 em memória.
 
 **Entregas:**
-- [ ] 6 colunas fixas (Novo Lead → Contato Realizado → Proposta Enviada →
+- [x] 6 colunas fixas (Novo Lead → Contato Realizado → Proposta Enviada →
       Negociação → Fechado Ganho → Fechado Perdido)
-- [ ] `DealCard`: título, badge de valor (R$), avatar do responsável, prazo
+- [x] `DealCard`: título, badge de valor (R$), avatar do responsável, prazo
       (vermelho + ícone ⚠️ se vencido)
-- [ ] Drag-and-drop entre colunas com @dnd-kit (estado mockado local)
-- [ ] Alternativa acessível por teclado/menu "Mover para..." (Seção 9.6 —
+- [x] Drag-and-drop entre colunas com @dnd-kit (estado mockado local)
+- [x] Alternativa acessível por teclado/menu "Mover para..." (Seção 9.6 —
       requisito mínimo de acessibilidade para o @dnd-kit)
-- [ ] Modal de confirmação ao mover para "Fechado Perdido", com campo
+- [x] Modal de confirmação ao mover para "Fechado Perdido", com campo
       opcional de motivo (Seção 9.5)
-- [ ] Estado vazio, skeleton de carregamento (2-3 cards/coluna) e toast de
+- [x] Estado vazio, skeleton de carregamento (2-3 cards/coluna) e toast de
       erro de rollback
 
 **Commit final:** `feat(ui): pipeline kanban visual com dnd-kit e estados de tela`
@@ -149,18 +149,18 @@ atividades — Seção 6.1, 6.3 e 9.3 — cobrindo os 4 estados em cada tela, co
 dados mockados.
 
 **Entregas:**
-- [ ] `/leads`: tabela (nome/empresa/status/responsável/última atividade) +
+- [x] `/leads`: tabela (nome/empresa/status/responsável/última atividade) +
       busca full-text + filtros (status/responsável/data) + paginação
       (20/página)
-- [ ] Estado vazio, skeleton (8 linhas), "busca sem resultado" e banner de
+- [x] Estado vazio, skeleton (8 linhas), "busca sem resultado" e banner de
       limite do plano Free (50 leads)
-- [ ] `/leads/new`: formulário com apenas nome obrigatório (react-hook-form
+- [x] `/leads/new`: formulário com apenas nome obrigatório (react-hook-form
       + zod + shadcn `form`)
-- [ ] `/leads/[id]`: cabeçalho (nome/empresa/cargo/status editável inline) +
+- [x] `/leads/[id]`: cabeçalho (nome/empresa/cargo/status editável inline) +
       timeline cronológica + negócios vinculados
-- [ ] Botão "Registrar atividade" sempre visível, abrindo drawer lateral
+- [x] Botão "Registrar atividade" sempre visível, abrindo drawer lateral
       (`Sheet`) com os 4 tipos (Ligação/E-mail/Reunião/Nota)
-- [ ] Estado de erro 404 (lead não encontrado ou fora do workspace ativo)
+- [x] Estado de erro 404 (lead não encontrado ou fora do workspace ativo)
 
 **Commit final:** `feat(ui): telas de leads, cadastro, detalhe e timeline de atividades`
 
