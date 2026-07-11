@@ -190,14 +190,14 @@ dados mockados.
 microcopy exatos das Seções 9.3/9.5, ainda mockadas.
 
 **Entregas:**
-- [ ] `/settings/workspace`: nome do workspace, dados gerais (Admin)
-- [ ] `/settings/team`: lista de membros + convites pendentes + modal
+- [x] `/settings/workspace`: nome do workspace, dados gerais (Admin)
+- [x] `/settings/team`: lista de membros + convites pendentes + modal
       "Convidar membro" com todos os estados de erro (Seção 9.3)
-- [ ] `/settings/billing`: plano atual, uso (colaboradores/leads), CTA de
+- [x] `/settings/billing`: plano atual, uso (colaboradores/leads), CTA de
       upgrade, acesso ao Customer Portal
-- [ ] `/settings/profile`: dados do usuário logado + toggle manual de tema
+- [x] `/settings/profile`: dados do usuário logado + toggle manual de tema
       (Seção 6.8)
-- [ ] Modais de confirmação destrutiva (remover membro, cancelar
+- [x] Modais de confirmação destrutiva (remover membro, cancelar
       assinatura) com a microcopy exata da Seção 9.5
 
 **Commit final:** `feat(ui): telas de configurações de workspace, equipe, plano e perfil`
