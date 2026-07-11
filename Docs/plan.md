@@ -126,16 +126,16 @@ onboarding e a página pública de aceite de convite — Seção 9.1 e Fluxos 1 
 em memória.
 
 **Entregas:**
-- [ ] 6 colunas fixas (Novo Lead → Contato Realizado → Proposta Enviada →
+- [x] 6 colunas fixas (Novo Lead → Contato Realizado → Proposta Enviada →
       Negociação → Fechado Ganho → Fechado Perdido)
-- [ ] `DealCard`: título, badge de valor (R$), avatar do responsável, prazo
+- [x] `DealCard`: título, badge de valor (R$), avatar do responsável, prazo
       (vermelho + ícone ⚠️ se vencido)
-- [ ] Drag-and-drop entre colunas com @dnd-kit (estado mockado local)
-- [ ] Alternativa acessível por teclado/menu "Mover para..." (Seção 9.6 —
+- [x] Drag-and-drop entre colunas com @dnd-kit (estado mockado local)
+- [x] Alternativa acessível por teclado/menu "Mover para..." (Seção 9.6 —
       requisito mínimo de acessibilidade para o @dnd-kit)
-- [ ] Modal de confirmação ao mover para "Fechado Perdido", com campo
+- [x] Modal de confirmação ao mover para "Fechado Perdido", com campo
       opcional de motivo (Seção 9.5)
-- [ ] Estado vazio, skeleton de carregamento (2-3 cards/coluna) e toast de
+- [x] Estado vazio, skeleton de carregamento (2-3 cards/coluna) e toast de
       erro de rollback
 
 **Commit final:** `feat(ui): pipeline kanban visual com dnd-kit e estados de tela`
