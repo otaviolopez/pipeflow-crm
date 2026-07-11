@@ -149,18 +149,18 @@ atividades — Seção 6.1, 6.3 e 9.3 — cobrindo os 4 estados em cada tela, co
 dados mockados.
 
 **Entregas:**
-- [ ] `/leads`: tabela (nome/empresa/status/responsável/última atividade) +
+- [x] `/leads`: tabela (nome/empresa/status/responsável/última atividade) +
       busca full-text + filtros (status/responsável/data) + paginação
       (20/página)
-- [ ] Estado vazio, skeleton (8 linhas), "busca sem resultado" e banner de
+- [x] Estado vazio, skeleton (8 linhas), "busca sem resultado" e banner de
       limite do plano Free (50 leads)
-- [ ] `/leads/new`: formulário com apenas nome obrigatório (react-hook-form
+- [x] `/leads/new`: formulário com apenas nome obrigatório (react-hook-form
       + zod + shadcn `form`)
-- [ ] `/leads/[id]`: cabeçalho (nome/empresa/cargo/status editável inline) +
+- [x] `/leads/[id]`: cabeçalho (nome/empresa/cargo/status editável inline) +
       timeline cronológica + negócios vinculados
-- [ ] Botão "Registrar atividade" sempre visível, abrindo drawer lateral
+- [x] Botão "Registrar atividade" sempre visível, abrindo drawer lateral
       (`Sheet`) com os 4 tipos (Ligação/E-mail/Reunião/Nota)
-- [ ] Estado de erro 404 (lead não encontrado ou fora do workspace ativo)
+- [x] Estado de erro 404 (lead não encontrado ou fora do workspace ativo)
 
 **Commit final:** `feat(ui): telas de leads, cadastro, detalhe e timeline de atividades`
 
