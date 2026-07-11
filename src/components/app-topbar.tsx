@@ -1,7 +1,8 @@
 "use client"
 
 import Link from "next/link"
-import { LogOut, UserRound } from "lucide-react"
+import { useTheme } from "next-themes"
+import { Check, LogOut, Monitor, Moon, Sun, SunMoon, UserRound } from "lucide-react"
 
 import { logout } from "@/app/login/actions"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
@@ -12,13 +13,23 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Separator } from "@/components/ui/separator"
 import { SidebarTrigger } from "@/components/ui/sidebar"
 
+const themeOptions = [
+  { value: "light", label: "Claro", icon: Sun },
+  { value: "dark", label: "Escuro", icon: Moon },
+  { value: "system", label: "Sistema", icon: Monitor },
+] as const
+
 export function AppTopbar({ userEmail }: { userEmail: string }) {
   const initials = userEmail.slice(0, 2).toUpperCase()
+  const { theme, setTheme } = useTheme()
 
   return (
     <header className="flex h-14 shrink-0 items-center gap-2 border-b px-4">
@@ -56,6 +67,24 @@ export function AppTopbar({ userEmail }: { userEmail: string }) {
               <UserRound />
               Perfil
             </DropdownMenuItem>
+            <DropdownMenuSub>
+              <DropdownMenuSubTrigger>
+                <SunMoon />
+                Tema
+              </DropdownMenuSubTrigger>
+              <DropdownMenuSubContent>
+                {themeOptions.map((option) => (
+                  <DropdownMenuItem
+                    key={option.value}
+                    onClick={() => setTheme(option.value)}
+                  >
+                    <option.icon />
+                    {option.label}
+                    {theme === option.value && <Check className="ml-auto" />}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuSubContent>
+            </DropdownMenuSub>
             <DropdownMenuSeparator />
             <DropdownMenuItem variant="destructive" onClick={() => logout()}>
               <LogOut />

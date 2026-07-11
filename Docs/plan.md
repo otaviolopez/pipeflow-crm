@@ -78,21 +78,21 @@ porque tema é uma decisão que afeta a aparência de todas as telas seguintes
 — melhor ter isso resolvido antes de construir o resto da interface.
 
 **Entregas:**
-- [ ] Configurar um provider de tema (ex: `next-themes`) na raiz do app,
+- [x] Configurar um provider de tema (ex: `next-themes`) na raiz do app,
       reaproveitando os tokens claro/escuro que já existem em
       `src/app/globals.css` (`.dark` + variáveis OKLCH) — falta só o
       mecanismo de alternância, os tokens já foram definidos no scaffold
-- [ ] Detecção da preferência do sistema operacional via
+- [x] Detecção da preferência do sistema operacional via
       `window.matchMedia("(prefers-color-scheme: dark)")`
-- [ ] Modal/dialog de preferência de tema, exibido uma única vez logo após
+- [x] Modal/dialog de preferência de tema, exibido uma única vez logo após
       o primeiro login, com 3 opções: "Manter modo claro" (padrão atual),
       "Usar modo escuro", "Seguir o sistema"
-- [ ] Persistir a escolha do usuário (cookie ou `localStorage` — sem
+- [x] Persistir a escolha do usuário (cookie ou `localStorage` — sem
       necessidade de tabela nova no banco para o MVP) para não perguntar de
       novo a cada login
-- [ ] Toggle manual de tema sempre acessível depois (ex: no dropdown do
+- [x] Toggle manual de tema sempre acessível depois (ex: no dropdown do
       avatar na `AppTopbar` do M1), para o usuário mudar de ideia
-- [ ] Conferir contraste mínimo 4.5:1 e foco visível em ambos os temas
+- [x] Conferir contraste mínimo 4.5:1 e foco visível em ambos os temas
       (Seção 9.6)
 
 **Commit final:** `feat(ui): dark mode com detecção de preferência do sistema`

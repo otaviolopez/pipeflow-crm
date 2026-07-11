@@ -4,6 +4,7 @@ import * as React from "react"
 
 import { AppSidebar } from "@/components/app-sidebar"
 import { AppTopbar } from "@/components/app-topbar"
+import { ThemePreferenceDialog } from "@/components/theme-preference-dialog"
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 import { TooltipProvider } from "@/components/ui/tooltip"
 import { useMediaQuery } from "@/hooks/use-media-query"
@@ -41,6 +42,8 @@ export function AppShell({
           <AppTopbar userEmail={userEmail} />
           {children}
         </SidebarInset>
+        {/* Pergunta a preferência de tema uma única vez após o login (PRD 6.8) */}
+        <ThemePreferenceDialog />
       </SidebarProvider>
     </TooltipProvider>
   )
