@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
-import { PagePlaceholder } from "@/components/page-placeholder";
+
+import { BillingSettings } from "@/components/settings/billing-settings";
 
 export const metadata: Metadata = { title: "Plano — PiperFlow" };
 
 export default function SettingsBillingPage() {
-  return <PagePlaceholder title="Plano e cobrança" milestone="M7" />;
+  return <BillingSettings />;
 }

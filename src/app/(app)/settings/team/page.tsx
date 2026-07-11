@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
-import { PagePlaceholder } from "@/components/page-placeholder";
+
+import { TeamSettings } from "@/components/settings/team-settings";
 
 export const metadata: Metadata = { title: "Equipe — PiperFlow" };
 
 export default function SettingsTeamPage() {
-  return <PagePlaceholder title="Equipe" milestone="M7" />;
+  return <TeamSettings />;
 }
