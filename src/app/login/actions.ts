@@ -17,7 +17,8 @@ export async function login(formData: FormData) {
   }
 
   revalidatePath("/", "layout");
-  redirect("/");
+  // Tela padrão ao logar é o pipeline, não o dashboard (PRD, Seção 9.4).
+  redirect("/pipeline");
 }
 
 export async function signup(formData: FormData) {

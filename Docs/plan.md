@@ -54,15 +54,15 @@ topbar de 56px — conforme Seção 9.4 do PRD. Ainda sem dados reais de
 workspace.
 
 **Entregas:**
-- [ ] Componente `AppSidebar`: workspace ativo (mock) + dropdown de troca,
+- [x] Componente `AppSidebar`: workspace ativo (mock) + dropdown de troca,
       links Pipeline/Leads/Dashboard, submenu Configurações
       (Workspace/Equipe/Plano)
-- [ ] Componente `AppTopbar` (logo + avatar do usuário com dropdown)
-- [ ] Route group `(app)` com layout compartilhado envolvendo `/pipeline`,
+- [x] Componente `AppTopbar` (logo + avatar do usuário com dropdown)
+- [x] Route group `(app)` com layout compartilhado envolvendo `/pipeline`,
       `/leads`, `/dashboard`, `/settings/*`
-- [ ] Sidebar colapsa para ícones em telas < 1280px, com tooltip no hover
+- [x] Sidebar colapsa para ícones em telas < 1280px, com tooltip no hover
       (Seção 9.4)
-- [ ] Focus ring visível em todos os itens de navegação (Seção 9.6)
+- [x] Focus ring visível em todos os itens de navegação (Seção 9.6)
 
 **Commit final:** `feat(ui): shell autenticado com sidebar, topbar e navegação`
 

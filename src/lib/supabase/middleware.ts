@@ -46,7 +46,8 @@ export async function updateSession(request: NextRequest) {
 
   if (isLoggedIn && isAuthRoute) {
     const url = request.nextUrl.clone();
-    url.pathname = "/";
+    // Tela padrão do usuário logado é o pipeline (PRD, Seção 9.4).
+    url.pathname = "/pipeline";
     return NextResponse.redirect(url);
   }
 
