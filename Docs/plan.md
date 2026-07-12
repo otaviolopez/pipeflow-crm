@@ -215,13 +215,13 @@ aplicar o schema multi-workspace já desenhado (`supabase/schema.sql`) e
 confirmar que a segurança funciona antes de conectar qualquer tela.
 
 **Entregas:**
-- [ ] Rodar `supabase/schema.sql` no SQL Editor do projeto Supabase (já
+- [x] Rodar `supabase/schema.sql` no SQL Editor do projeto Supabase (já
       configurado em `.env.local`)
-- [ ] Gerar tipos reais (`supabase gen types typescript`) e substituir
+- [x] Gerar tipos reais (`supabase gen types typescript`) e substituir
       `database.types.ts`
-- [ ] Adicionar `SUPABASE_SERVICE_ROLE_KEY` ao `.env.local` (nunca
+- [x] Adicionar `SUPABASE_SERVICE_ROLE_KEY` ao `.env.local` (nunca
       commitado, nunca em `NEXT_PUBLIC_*`)
-- [ ] Testar RLS manualmente: criar 2 workspaces com 2 usuários diferentes
+- [x] Testar RLS manualmente: criar 2 workspaces com 2 usuários diferentes
       e confirmar isolamento total de dados entre eles
 
 **Commit final:** `feat(backend): aplica schema multi-workspace real e valida RLS`
