@@ -6,6 +6,7 @@ import { revalidatePath } from "next/cache";
 import { Resend } from "resend";
 
 import { createClient } from "@/lib/supabase/server";
+import { stripe } from "@/lib/stripe/client";
 import { getActiveWorkspace, getUserWorkspaces } from "@/lib/workspace/session";
 
 import { FREE_PLAN_MEMBER_LIMIT, ROLE_LABELS } from "./types";
@@ -188,4 +189,39 @@ export async function removeMember(memberId: string) {
 
   revalidatePath("/settings/team");
   return {};
+}
+
+export async function cancelSubscription() {
+  const supabase = await createClient();
+  const workspace = await getActiveWorkspace(await getUserWorkspaces());
+  if (!workspace) {
+    return { error: "Nenhum workspace ativo." };
+  }
+
+  const { data: workspaceRow } = await supabase
+    .from("workspaces")
+    .select("stripe_subscription_id")
+    .eq("id", workspace.id)
+    .maybeSingle();
+  if (!workspaceRow?.stripe_subscription_id) {
+    return { error: "Nenhuma assinatura ativa encontrada." };
+  }
+
+  try {
+    const subscription = await stripe.subscriptions.update(workspaceRow.stripe_subscription_id, {
+      cancel_at_period_end: true,
+    });
+
+    // O plano só volta pra "free" de verdade quando o webhook recebe
+    // customer.subscription.deleted, no fim do período — cancelar agora só
+    // agenda o fim do acesso Pro (PRD, Seção 9.5).
+    const periodEnd = subscription.items.data[0]?.current_period_end;
+
+    revalidatePath("/settings/billing");
+    return {
+      expiresAt: periodEnd ? new Date(periodEnd * 1000).toISOString() : null,
+    };
+  } catch {
+    return { error: "Não foi possível cancelar a assinatura. Tente novamente." };
+  }
 }

@@ -3,6 +3,17 @@ import { createClient } from "@/lib/supabase/server";
 
 import type { Activity, ActivityType, Lead, LeadStatus } from "./types";
 
+// Contagem enxuta (head: true, sem baixar linhas) — usada na tela de
+// billing pra mostrar o uso real de leads contra o limite do plano.
+export async function getLeadsCountForWorkspace(workspaceId: string): Promise<number> {
+  const supabase = await createClient();
+  const { count } = await supabase
+    .from("leads")
+    .select("id", { count: "exact", head: true })
+    .eq("workspace_id", workspaceId);
+  return count ?? 0;
+}
+
 export async function getLeadsForWorkspace(workspaceId: string): Promise<Lead[]> {
   const supabase = await createClient();
 

@@ -19,11 +19,13 @@ export function CancelSubscriptionDialog({
   onOpenChange,
   expiresAtLabel,
   onConfirm,
+  isPending,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   expiresAtLabel: string;
   onConfirm: () => void;
+  isPending: boolean;
 }) {
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
@@ -37,9 +39,9 @@ export function CancelSubscriptionDialog({
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Manter Pro</AlertDialogCancel>
-          <AlertDialogAction variant="destructive" onClick={onConfirm}>
-            Cancelar assinatura
+          <AlertDialogCancel disabled={isPending}>Manter Pro</AlertDialogCancel>
+          <AlertDialogAction variant="destructive" onClick={onConfirm} disabled={isPending}>
+            {isPending ? "Cancelando..." : "Cancelar assinatura"}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

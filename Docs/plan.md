@@ -306,16 +306,16 @@ otimista de verdade.
 e 12 do PRD.
 
 **Entregas:**
-- [ ] `POST /api/stripe/checkout` (cria sessão de Stripe Checkout)
-- [ ] `POST /api/stripe/portal` (cria sessão de Customer Portal)
-- [ ] `POST /api/stripe/webhook` com verificação de assinatura
+- [x] `POST /api/stripe/checkout` (cria sessão de Stripe Checkout)
+- [x] `POST /api/stripe/portal` (cria sessão de Customer Portal)
+- [x] `POST /api/stripe/webhook` com verificação de assinatura
       (`stripe.webhooks.constructEvent`) — regra inegociável do CLAUDE.md
-- [ ] Idempotência do webhook: guardar `event.id` processados antes de
+- [x] Idempotência do webhook: guardar `event.id` processados antes de
       aplicar qualquer efeito colateral (CLAUDE.md)
-- [ ] Atualização automática do plano do workspace nos eventos
+- [x] Atualização automática do plano do workspace nos eventos
       `checkout.session.completed`, `customer.subscription.updated` e
       `customer.subscription.deleted`
-- [ ] `STRIPE_WEBHOOK_SECRET` adicionado ao `.env.local`
+- [x] `STRIPE_WEBHOOK_SECRET` adicionado ao `.env.local`
 
 **Commit final:** `feat(backend): assinatura Stripe com checkout, portal e webhook`
 

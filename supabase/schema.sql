@@ -44,6 +44,18 @@ create table if not exists public.invites (
   created_at timestamptz not null default now()
 );
 
+-- M13: guarda o id de cada evento do webhook do Stripe já processado, pra
+-- garantir idempotência (CLAUDE.md — nunca aplicar o mesmo evento duas
+-- vezes). Só o webhook (service role) toca essa tabela; por isso RLS
+-- habilitada sem nenhuma policy — nem authenticated nem anon conseguem ler
+-- ou escrever aqui, de propósito.
+create table if not exists public.stripe_webhook_events (
+  id text primary key, -- event.id do Stripe (ex.: "evt_...")
+  processed_at timestamptz not null default now()
+);
+
+alter table public.stripe_webhook_events enable row level security;
+
 create table if not exists public.profiles (
   id uuid primary key references auth.users (id) on delete cascade,
   name text not null,

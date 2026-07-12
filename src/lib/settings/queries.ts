@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { stripe } from "@/lib/stripe/client";
 
 import type { Invite, Member, MemberRole } from "./types";
 
@@ -54,4 +55,28 @@ export async function getPendingInvites(workspaceId: string): Promise<Invite[]> 
     role: row.role as MemberRole,
     createdAt: row.created_at,
   }));
+}
+
+export type SubscriptionStatus = {
+  currentPeriodEnd: string; // ISO
+  cancelAtPeriodEnd: boolean;
+};
+
+// current_period_end vive em cada item da assinatura (não mais no objeto
+// Subscription em si) nas versões recentes da API do Stripe.
+export async function getSubscriptionStatus(
+  subscriptionId: string
+): Promise<SubscriptionStatus | null> {
+  try {
+    const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+    const currentPeriodEnd = subscription.items.data[0]?.current_period_end;
+    if (!currentPeriodEnd) return null;
+
+    return {
+      currentPeriodEnd: new Date(currentPeriodEnd * 1000).toISOString(),
+      cancelAtPeriodEnd: subscription.cancel_at_period_end,
+    };
+  } catch {
+    return null;
+  }
 }

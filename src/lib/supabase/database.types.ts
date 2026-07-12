@@ -228,6 +228,21 @@ export type Database = {
         }
         Relationships: []
       }
+      stripe_webhook_events: {
+        Row: {
+          id: string
+          processed_at: string
+        }
+        Insert: {
+          id: string
+          processed_at?: string
+        }
+        Update: {
+          id?: string
+          processed_at?: string
+        }
+        Relationships: []
+      }
       workspace_members: {
         Row: {
           created_at: string

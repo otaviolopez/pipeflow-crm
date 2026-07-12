@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { addDays, format } from "date-fns";
+import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { toast } from "sonner";
 
@@ -9,36 +9,73 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FREE_PLAN_LEAD_LIMIT } from "@/lib/leads/types";
+import { cancelSubscription } from "@/lib/settings/actions";
+import type { SubscriptionStatus } from "@/lib/settings/queries";
 import { FREE_PLAN_MEMBER_LIMIT, PRO_PLAN_PRICE_LABEL } from "@/lib/settings/types";
 import type { Plan } from "@/lib/settings/types";
 
 import { CancelSubscriptionDialog } from "./cancel-subscription-dialog";
 
-// Uso mockado — vem das contagens reais de leads/membros só quando o
-// dashboard (M14) e a equipe (M9) estiverem conectados ao Supabase.
-const MOCK_USAGE = { members: 2, leads: 48 };
-
-export function BillingSettings() {
-  const [plan, setPlan] = React.useState<Plan>("free");
-  const [cancelAtPeriodEnd, setCancelAtPeriodEnd] = React.useState(false);
+export function BillingSettings({
+  plan,
+  membersUsed,
+  leadsUsed,
+  subscriptionStatus,
+}: {
+  plan: Plan;
+  membersUsed: number;
+  leadsUsed: number;
+  subscriptionStatus: SubscriptionStatus | null;
+}) {
+  const [isRedirecting, setIsRedirecting] = React.useState(false);
+  const [isCancelling, setIsCancelling] = React.useState(false);
   const [isCancelOpen, setIsCancelOpen] = React.useState(false);
+  // Espelha o cancel_at_period_end real do Stripe; atualizado localmente só
+  // pra feedback imediato depois de confirmar — a fonte de verdade volta a
+  // ser o servidor no próximo carregamento da página.
+  const [cancelAtPeriodEnd, setCancelAtPeriodEnd] = React.useState(
+    subscriptionStatus?.cancelAtPeriodEnd ?? false
+  );
 
-  // "Se cancelar agora, o acesso Pro dura até esta data" — calculada uma
-  // vez para o texto do diálogo de confirmação bater com o toast depois.
-  const candidateExpiryDate = React.useMemo(() => addDays(new Date(), 30), []);
-  const expiryLabel = format(candidateExpiryDate, "dd/MM/yyyy", { locale: ptBR });
+  const expiryLabel = subscriptionStatus
+    ? format(new Date(subscriptionStatus.currentPeriodEnd), "dd/MM/yyyy", { locale: ptBR })
+    : null;
 
-  function handleUpgrade() {
-    // Mock: em produção isso redireciona pro Stripe Checkout (M13).
-    setPlan("pro");
-    setCancelAtPeriodEnd(false);
-    toast.success("🎉 Bem-vindo ao Pro! Limites removidos.");
+  async function redirectTo(path: "checkout" | "portal") {
+    setIsRedirecting(true);
+    try {
+      const response = await fetch(`/api/stripe/${path}`, { method: "POST" });
+      const data = await response.json();
+      if (!response.ok || !data.url) {
+        toast.error(data.error ?? "Não foi possível continuar. Tente novamente.");
+        setIsRedirecting(false);
+        return;
+      }
+      window.location.href = data.url;
+    } catch {
+      toast.error("Não foi possível continuar. Tente novamente.");
+      setIsRedirecting(false);
+    }
   }
 
   function handleCancelConfirm() {
-    setCancelAtPeriodEnd(true);
-    setIsCancelOpen(false);
-    toast.success(`Assinatura cancelada. Acesso Pro mantido até ${expiryLabel}.`);
+    setIsCancelling(true);
+    (async () => {
+      const result = await cancelSubscription();
+      setIsCancelling(false);
+      setIsCancelOpen(false);
+
+      if (result.error) {
+        toast.error(result.error);
+        return;
+      }
+
+      setCancelAtPeriodEnd(true);
+      const label = result.expiresAt
+        ? format(new Date(result.expiresAt), "dd/MM/yyyy", { locale: ptBR })
+        : "o fim do período atual";
+      toast.success(`Assinatura cancelada. Acesso Pro mantido até ${label}.`);
+    })();
   }
 
   return (
@@ -62,14 +99,10 @@ export function BillingSettings() {
         <CardContent className="flex flex-col gap-4">
           {plan === "free" ? (
             <>
-              <UsageBar
-                label="Colaboradores"
-                used={MOCK_USAGE.members}
-                limit={FREE_PLAN_MEMBER_LIMIT}
-              />
-              <UsageBar label="Leads" used={MOCK_USAGE.leads} limit={FREE_PLAN_LEAD_LIMIT} />
-              <Button className="w-fit" onClick={handleUpgrade}>
-                Fazer upgrade para Pro
+              <UsageBar label="Colaboradores" used={membersUsed} limit={FREE_PLAN_MEMBER_LIMIT} />
+              <UsageBar label="Leads" used={leadsUsed} limit={FREE_PLAN_LEAD_LIMIT} />
+              <Button className="w-fit" disabled={isRedirecting} onClick={() => redirectTo("checkout")}>
+                {isRedirecting ? "Redirecionando..." : "Fazer upgrade para Pro"}
               </Button>
             </>
           ) : (
@@ -87,9 +120,17 @@ export function BillingSettings() {
                   className="w-fit"
                   onClick={() => setIsCancelOpen(true)}
                 >
-                  Gerenciar assinatura
+                  Cancelar assinatura
                 </Button>
               )}
+              <Button
+                variant="ghost"
+                className="w-fit"
+                disabled={isRedirecting}
+                onClick={() => redirectTo("portal")}
+              >
+                {isRedirecting ? "Redirecionando..." : "Ver faturas e forma de pagamento"}
+              </Button>
             </>
           )}
         </CardContent>
@@ -98,8 +139,9 @@ export function BillingSettings() {
       <CancelSubscriptionDialog
         open={isCancelOpen}
         onOpenChange={setIsCancelOpen}
-        expiresAtLabel={expiryLabel}
+        expiresAtLabel={expiryLabel ?? "o fim do período atual"}
         onConfirm={handleCancelConfirm}
+        isPending={isCancelling}
       />
     </div>
   );
