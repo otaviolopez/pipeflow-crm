@@ -3,7 +3,8 @@
 export type MemberRole = "admin" | "member";
 
 export type Member = {
-  id: string;
+  id: string; // id da linha em workspace_members (usado para remover)
+  userId: string; // id do usuário (auth.users/profiles) — compara com a sessão atual
   name: string;
   email: string;
   role: MemberRole;

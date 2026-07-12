@@ -11,7 +11,11 @@ export async function acceptInviteForCurrentUser(token: string) {
   });
 
   if (error || !data) {
-    throw new Error("Convite inválido ou expirado.");
+    // Propaga a mensagem específica da exception do accept_invite (ex.:
+    // limite de colaboradores do Free atingido) — sem isso, todo erro de
+    // aceite viraria "Convite inválido ou expirado.", inclusive quando a
+    // causa real é outra (CLAUDE.md, Seção 9.3: erros devem ser específicos).
+    throw new Error(error?.message || "Convite inválido ou expirado.");
   }
 
   await setActiveWorkspaceCookie(data);

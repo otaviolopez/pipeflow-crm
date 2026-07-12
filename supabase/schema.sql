@@ -47,8 +47,16 @@ create table if not exists public.invites (
 create table if not exists public.profiles (
   id uuid primary key references auth.users (id) on delete cascade,
   name text not null,
+  email text,
   created_at timestamptz not null default now()
 );
+
+-- M12: /settings/team precisa mostrar o e-mail de cada colaborador. Sem essa
+-- coluna, a única fonte de e-mail seria auth.users — schema protegido que a
+-- aplicação não deve consultar direto (mesmo motivo do nome em profiles).
+-- "add column if not exists" cobre o banco já existente (profiles criado no
+-- M10, antes desta coluna existir); o "create table" acima já cobre instalações novas.
+alter table public.profiles add column if not exists email text;
 
 create table if not exists public.leads (
   id uuid primary key default gen_random_uuid(),
@@ -179,8 +187,8 @@ security definer
 set search_path = ''
 as $$
 begin
-  insert into public.profiles (id, name)
-  values (new.id, split_part(new.email, '@', 1));
+  insert into public.profiles (id, name, email)
+  values (new.id, split_part(new.email, '@', 1), new.email);
   return new;
 end;
 $$;
@@ -193,10 +201,17 @@ create trigger on_auth_user_created
 -- Backfill: usuários criados antes deste trigger existir (ex.: contas de
 -- teste do M8/M9) ainda não têm profile — roda uma vez e é seguro repetir
 -- (on conflict do nothing) se este arquivo for executado de novo.
-insert into public.profiles (id, name)
-select id, split_part(email, '@', 1)
+insert into public.profiles (id, name, email)
+select id, split_part(email, '@', 1), email
 from auth.users
 on conflict (id) do nothing;
+
+-- Backfill do e-mail para profiles criados antes da coluna existir (M10).
+update public.profiles
+set email = u.email
+from auth.users u
+where profiles.id = u.id
+  and profiles.email is null;
 
 -- Aceitar convite (POST /api/invites/:token/accept da Seção 12 do PRD):
 -- valida o token, cria a associação em workspace_members e marca o convite
@@ -209,6 +224,8 @@ set search_path = ''
 as $$
 declare
   _invite public.invites;
+  _workspace_plan text;
+  _member_count integer;
 begin
   select *
   into _invite
@@ -219,6 +236,25 @@ begin
 
   if not found then
     raise exception 'Convite inválido ou expirado.';
+  end if;
+
+  -- Re-checa o limite de 2 colaboradores do Free aqui também (não só na
+  -- criação do convite, em createInvite): o convite pode ficar pendente por
+  -- dias, e o workspace pode ter ganhado outro membro nesse meio tempo —
+  -- confiar só na checagem de quando o convite foi criado deixaria passar
+  -- workspaces com mais membros do que o plano permite (CLAUDE.md: limite de
+  -- plano sempre revalidado no servidor). Manter "2" em sincronia com
+  -- FREE_PLAN_MEMBER_LIMIT em src/lib/settings/types.ts.
+  select plan into _workspace_plan
+  from public.workspaces
+  where id = _invite.workspace_id;
+
+  select count(*) into _member_count
+  from public.workspace_members
+  where workspace_id = _invite.workspace_id;
+
+  if _workspace_plan = 'free' and _member_count >= 2 then
+    raise exception 'Este workspace já atingiu o limite de 2 colaboradores do plano Free.';
   end if;
 
   insert into public.workspace_members (workspace_id, user_id, role)

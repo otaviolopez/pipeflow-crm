@@ -290,11 +290,11 @@ otimista de verdade.
 **Objetivo:** conectar `/settings/team` a convites reais por e-mail.
 
 **Entregas:**
-- [ ] Server Action criar convite (gera token, grava em `invites`, dispara
+- [x] Server Action criar convite (gera token, grava em `invites`, dispara
       e-mail via Resend)
-- [ ] Envio de e-mail transacional de convite (Resend)
-- [ ] Server Action remover membro (Admin)
-- [ ] Validação server-side do limite de 2 colaboradores no plano Free
+- [x] Envio de e-mail transacional de convite (Resend)
+- [x] Server Action remover membro (Admin)
+- [x] Validação server-side do limite de 2 colaboradores no plano Free
 
 **Commit final:** `feat(backend): convites por e-mail e gestão de equipe conectados`
 

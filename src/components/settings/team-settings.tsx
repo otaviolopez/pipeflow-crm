@@ -15,9 +15,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { formatRelativeDate } from "@/lib/leads/format";
-import { INITIAL_INVITES, INITIAL_MEMBERS } from "@/lib/settings/mock-data";
+import { removeMember } from "@/lib/settings/actions";
 import { FREE_PLAN_MEMBER_LIMIT, ROLE_LABELS } from "@/lib/settings/types";
-import type { Invite, Member, MemberRole } from "@/lib/settings/types";
+import type { Invite, Member } from "@/lib/settings/types";
 
 import { InviteMemberDialog } from "./invite-member-dialog";
 import { RemoveMemberDialog } from "./remove-member-dialog";
@@ -31,26 +31,34 @@ function initials(name: string): string {
     .join("");
 }
 
-export function TeamSettings() {
-  const [members, setMembers] = React.useState<Member[]>(INITIAL_MEMBERS);
-  const [invites, setInvites] = React.useState<Invite[]>(INITIAL_INVITES);
+export function TeamSettings({
+  members,
+  invites,
+  currentUserId,
+  isFreePlan,
+}: {
+  members: Member[];
+  invites: Invite[];
+  currentUserId: string;
+  isFreePlan: boolean;
+}) {
+  const [isPending, startTransition] = React.useTransition();
   const [isInviteOpen, setIsInviteOpen] = React.useState(false);
   const [memberToRemove, setMemberToRemove] = React.useState<Member | null>(null);
 
-  const isAtLimit = members.length >= FREE_PLAN_MEMBER_LIMIT;
-
-  function handleInvite(email: string, role: MemberRole) {
-    setInvites((prev) => [
-      { id: crypto.randomUUID(), email, role, createdAt: new Date().toISOString() },
-      ...prev,
-    ]);
-    toast.success(`Convite enviado para ${email}.`);
-  }
+  const isAtLimit = isFreePlan && members.length + invites.length >= FREE_PLAN_MEMBER_LIMIT;
 
   function handleRemoveConfirm() {
     if (!memberToRemove) return;
-    setMembers((prev) => prev.filter((member) => member.id !== memberToRemove.id));
-    toast.success("Membro removido da equipe.");
+    const target = memberToRemove;
+    startTransition(async () => {
+      const result = await removeMember(target.id);
+      if (result.error) {
+        toast.error(result.error);
+        return;
+      }
+      toast.success("Membro removido da equipe.");
+    });
     setMemberToRemove(null);
   }
 
@@ -74,50 +82,53 @@ export function TeamSettings() {
           <CardTitle className="text-sm">Membros</CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col divide-y divide-border px-0">
-          {members.map((member) => (
-            <div key={member.id} className="flex items-center justify-between gap-3 px-6 py-2.5">
-              <div className="flex items-center gap-3">
-                <Avatar size="sm">
-                  <AvatarFallback>{initials(member.name)}</AvatarFallback>
-                </Avatar>
-                <div className="flex flex-col">
-                  <span className="text-sm font-medium">
-                    {member.name}
-                    {member.id === "current" && (
-                      <span className="ml-1.5 text-xs text-muted-foreground">(você)</span>
-                    )}
-                  </span>
-                  <span className="text-xs text-muted-foreground">{member.email}</span>
+          {members.map((member) => {
+            const isCurrentUser = member.userId === currentUserId;
+            return (
+              <div key={member.id} className="flex items-center justify-between gap-3 px-6 py-2.5">
+                <div className="flex items-center gap-3">
+                  <Avatar size="sm">
+                    <AvatarFallback>{initials(member.name)}</AvatarFallback>
+                  </Avatar>
+                  <div className="flex flex-col">
+                    <span className="text-sm font-medium">
+                      {member.name}
+                      {isCurrentUser && (
+                        <span className="ml-1.5 text-xs text-muted-foreground">(você)</span>
+                      )}
+                    </span>
+                    <span className="text-xs text-muted-foreground">{member.email}</span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Badge variant="secondary">{ROLE_LABELS[member.role]}</Badge>
+                  {!isCurrentUser && (
+                    <DropdownMenu>
+                      <DropdownMenuTrigger
+                        render={
+                          <Button
+                            variant="ghost"
+                            size="icon-sm"
+                            aria-label={`Mais ações para ${member.name}`}
+                          />
+                        }
+                      >
+                        <MoreVertical />
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem
+                          variant="destructive"
+                          onClick={() => setMemberToRemove(member)}
+                        >
+                          Remover da equipe
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  )}
                 </div>
               </div>
-              <div className="flex items-center gap-2">
-                <Badge variant="secondary">{ROLE_LABELS[member.role]}</Badge>
-                {member.id !== "current" && (
-                  <DropdownMenu>
-                    <DropdownMenuTrigger
-                      render={
-                        <Button
-                          variant="ghost"
-                          size="icon-sm"
-                          aria-label={`Mais ações para ${member.name}`}
-                        />
-                      }
-                    >
-                      <MoreVertical />
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem
-                        variant="destructive"
-                        onClick={() => setMemberToRemove(member)}
-                      >
-                        Remover da equipe
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                )}
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </CardContent>
       </Card>
 
@@ -153,15 +164,13 @@ export function TeamSettings() {
       <InviteMemberDialog
         open={isInviteOpen}
         onOpenChange={setIsInviteOpen}
-        members={members}
-        invites={invites}
         isAtLimit={isAtLimit}
-        onInvite={handleInvite}
       />
       <RemoveMemberDialog
         member={memberToRemove}
         onConfirm={handleRemoveConfirm}
         onCancel={() => setMemberToRemove(null)}
+        isPending={isPending}
       />
     </div>
   );

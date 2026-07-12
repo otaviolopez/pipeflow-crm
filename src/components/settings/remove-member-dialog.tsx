@@ -17,10 +17,12 @@ export function RemoveMemberDialog({
   member,
   onConfirm,
   onCancel,
+  isPending,
 }: {
   member: Member | null;
   onConfirm: () => void;
   onCancel: () => void;
+  isPending: boolean;
 }) {
   return (
     <AlertDialog open={!!member} onOpenChange={(open) => !open && onCancel()}>
@@ -32,9 +34,9 @@ export function RemoveMemberDialog({
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancelar</AlertDialogCancel>
-          <AlertDialogAction variant="destructive" onClick={onConfirm}>
-            Remover
+          <AlertDialogCancel disabled={isPending}>Cancelar</AlertDialogCancel>
+          <AlertDialogAction variant="destructive" onClick={onConfirm} disabled={isPending}>
+            {isPending ? "Removendo..." : "Remover"}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

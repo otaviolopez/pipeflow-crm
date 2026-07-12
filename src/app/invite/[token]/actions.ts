@@ -22,8 +22,8 @@ export async function loginAndAcceptInvite(token: string, formData: FormData) {
 
   try {
     await acceptInviteForCurrentUser(token);
-  } catch {
-    return { error: "Convite inválido ou expirado." };
+  } catch (err) {
+    return { error: err instanceof Error ? err.message : "Convite inválido ou expirado." };
   }
 
   revalidatePath("/", "layout");
@@ -58,8 +58,8 @@ export async function signupAndAcceptInvite(token: string, formData: FormData) {
 
   try {
     await acceptInviteForCurrentUser(token);
-  } catch {
-    return { error: "Convite inválido ou expirado." };
+  } catch (err) {
+    return { error: err instanceof Error ? err.message : "Convite inválido ou expirado." };
   }
 
   revalidatePath("/", "layout");

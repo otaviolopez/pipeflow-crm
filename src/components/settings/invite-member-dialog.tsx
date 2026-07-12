@@ -4,6 +4,7 @@ import * as React from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
@@ -24,8 +25,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { createInvite } from "@/lib/settings/actions";
 import { ROLE_LABELS } from "@/lib/settings/types";
-import type { Invite, Member, MemberRole } from "@/lib/settings/types";
+import type { MemberRole } from "@/lib/settings/types";
 
 const inviteSchema = z.object({
   email: z.string().trim().min(1, "Informe um e-mail.").email("E-mail inválido."),
@@ -37,17 +39,11 @@ type InviteValues = z.infer<typeof inviteSchema>;
 export function InviteMemberDialog({
   open,
   onOpenChange,
-  members,
-  invites,
   isAtLimit,
-  onInvite,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  members: Member[];
-  invites: Invite[];
   isAtLimit: boolean;
-  onInvite: (email: string, role: MemberRole) => void;
 }) {
   const [isSending, setIsSending] = React.useState(false);
 
@@ -62,34 +58,20 @@ export function InviteMemberDialog({
   }
 
   async function onSubmit(values: InviteValues) {
-    const normalizedEmail = values.email.trim().toLowerCase();
-
-    // Estados de erro exatos da Seção 9.3 do PRD — checados antes de
-    // "enviar", com o campo de e-mail marcado inválido.
-    const memberExists = members.some(
-      (member) => member.email.toLowerCase() === normalizedEmail
-    );
-    if (memberExists) {
-      form.setError("email", { message: "Este e-mail já faz parte da sua equipe." });
-      return;
-    }
-
-    const inviteExists = invites.some(
-      (invite) => invite.email.toLowerCase() === normalizedEmail
-    );
-    if (inviteExists) {
-      form.setError("email", {
-        message: "Já existe um convite pendente para este e-mail.",
-      });
-      return;
-    }
-
     setIsSending(true);
-    // Mock: envio real via Resend só no M12.
-    await new Promise((resolve) => setTimeout(resolve, 600));
+    const result = await createInvite({ email: values.email.trim(), role: values.role });
     setIsSending(false);
 
-    onInvite(values.email.trim(), values.role);
+    if (result.error) {
+      // Erros de duplicidade/limite voltam como mensagem genérica do
+      // servidor — mostramos no campo de e-mail por ser o mais relevante
+      // visualmente, já que quase todo erro de criação de convite se refere
+      // a ele (duplicado, limite atingido, etc.).
+      form.setError("email", { message: result.error });
+      return;
+    }
+
+    toast.success(`Convite enviado para ${values.email.trim()}.`);
     form.reset();
     onOpenChange(false);
   }
