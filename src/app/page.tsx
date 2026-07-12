@@ -9,6 +9,8 @@ import {
   Sparkles,
 } from "lucide-react";
 
+import { BackToTopButton } from "@/components/back-to-top-button";
+import { ScrollReveal } from "@/components/scroll-reveal";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
@@ -221,7 +223,7 @@ function PipelinePreview() {
 function Features() {
   return (
     <section id="funcionalidades" className="mx-auto w-full max-w-6xl px-6 py-24">
-      <div className="mx-auto max-w-xl text-center">
+      <ScrollReveal from="bottom" className="mx-auto max-w-xl text-center">
         <h2 className="font-heading text-3xl font-semibold tracking-tight sm:text-4xl">
           Feito só pra vender
         </h2>
@@ -229,19 +231,23 @@ function Features() {
           Sem os módulos de marketing e service que deixam os CRMs grandes
           complicados demais pra um time pequeno.
         </p>
-      </div>
+      </ScrollReveal>
 
       <div className="mt-14 grid grid-cols-1 gap-4 sm:grid-cols-2">
-        {FEATURES.map((feature) => (
-          <Card key={feature.title}>
-            <CardContent className="flex flex-col gap-3">
-              <div className="flex size-10 items-center justify-center rounded-lg bg-muted">
-                <feature.icon className="size-5 text-foreground" />
-              </div>
-              <h3 className="font-heading text-lg font-medium">{feature.title}</h3>
-              <p className="text-sm text-muted-foreground">{feature.description}</p>
-            </CardContent>
-          </Card>
+        {FEATURES.map((feature, index) => (
+          // Card da esquerda entra vindo da esquerda, card da direita vindo
+          // da direita — reforça a leitura em coluna do grid 2x2.
+          <ScrollReveal key={feature.title} from={index % 2 === 0 ? "left" : "right"}>
+            <Card className="transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:ring-foreground/25">
+              <CardContent className="flex flex-col gap-3">
+                <div className="flex size-10 items-center justify-center rounded-lg bg-muted transition-colors duration-300 group-hover/card:bg-foreground group-hover/card:text-background">
+                  <feature.icon className="size-5 text-foreground transition-colors duration-300 group-hover/card:text-background" />
+                </div>
+                <h3 className="font-heading text-lg font-medium">{feature.title}</h3>
+                <p className="text-sm text-muted-foreground">{feature.description}</p>
+              </CardContent>
+            </Card>
+          </ScrollReveal>
         ))}
       </div>
     </section>
@@ -252,7 +258,7 @@ function Pricing() {
   return (
     <section id="precos" className="border-t border-border/60 bg-muted/20">
       <div className="mx-auto w-full max-w-6xl px-6 py-24">
-        <div className="mx-auto max-w-xl text-center">
+        <ScrollReveal from="bottom" className="mx-auto max-w-xl text-center">
           <h2 className="font-heading text-3xl font-semibold tracking-tight sm:text-4xl">
             Planos e preços
           </h2>
@@ -260,20 +266,33 @@ function Pricing() {
             Comece de graça. Faça upgrade quando o time e a carteira de
             clientes crescerem — o limite é por workspace, não por conta.
           </p>
-        </div>
+        </ScrollReveal>
 
         <div className="mx-auto mt-14 grid max-w-3xl grid-cols-1 gap-6 sm:grid-cols-2">
-          {PLANS.map((plan) => (
+          {PLANS.map((plan, index) => (
             // O badge fica num wrapper à parte porque o Card tem
             // overflow-hidden embutido e cortaria o badge poking para fora
-            // no topo (-top-3).
-            <div key={plan.name} className="relative">
+            // no topo (-top-3). Plano da esquerda entra da esquerda, plano
+            // da direita entra da direita, igual à seção de funcionalidades.
+            <ScrollReveal
+              key={plan.name}
+              from={index % 2 === 0 ? "left" : "right"}
+              className="relative"
+            >
               {plan.highlighted && (
                 <span className="absolute -top-3 left-1/2 z-10 -translate-x-1/2 rounded-full bg-foreground px-3 py-1 text-xs font-medium text-background">
                   Mais popular
                 </span>
               )}
-              <Card className={cn(plan.highlighted && "ring-2 ring-foreground")}>
+              <Card
+                className={cn(
+                  "transition-all duration-300 hover:-translate-y-1 hover:shadow-lg",
+                  // O plano Pro já tem ring cheio permanente (destaque de
+                  // "mais popular") — só o Free ganha o ring de hover, pra
+                  // não enfraquecer o ring do Pro ao passar o mouse.
+                  plan.highlighted ? "ring-2 ring-foreground" : "hover:ring-foreground/25"
+                )}
+              >
                 <CardContent className="flex flex-col gap-6">
                   <div className="flex flex-col gap-1">
                     <span className="font-heading text-lg font-medium">{plan.name}</span>
@@ -304,7 +323,7 @@ function Pricing() {
                   </Button>
                 </CardContent>
               </Card>
-            </div>
+            </ScrollReveal>
           ))}
         </div>
       </div>
@@ -314,17 +333,30 @@ function Pricing() {
 
 function FinalCta() {
   return (
-    <section className="mx-auto w-full max-w-6xl px-6 py-24 text-center">
-      <h2 className="mx-auto max-w-lg text-balance font-heading text-3xl font-semibold tracking-tight sm:text-4xl">
-        Organize suas vendas em menos de 5 minutos.
-      </h2>
-      <p className="mx-auto mt-3 max-w-md text-muted-foreground">
-        Sem cartão de crédito. Sem trial disfarçado. É Free de verdade.
-      </p>
-      <Button size="lg" className="mt-8" render={<Link href="/signup" />}>
-        Criar conta grátis
-        <ArrowRight />
-      </Button>
+    <section className="relative mx-auto w-full max-w-6xl px-6 py-24 text-center">
+      <ScrollReveal from="bottom" className="mx-auto flex max-w-lg flex-col items-center">
+        <h2 className="text-balance font-heading text-3xl font-semibold tracking-tight sm:text-4xl">
+          Organize suas vendas em menos de 5 minutos.
+        </h2>
+        <p className="mt-3 max-w-md text-muted-foreground">
+          Sem cartão de crédito. Sem trial disfarçado. É Free de verdade.
+        </p>
+        <Button size="lg" className="mt-8" render={<Link href="/signup" />}>
+          Criar conta grátis
+          <ArrowRight />
+        </Button>
+      </ScrollReveal>
+
+      {/* Abaixo do card no mobile (fluxo normal, centralizado); a partir de
+          lg vira uma faixa absoluta colada na borda direita da seção, com a
+          mesma altura dela — o botão fica sempre no centro vertical, ao
+          lado do card, sem precisar de um gap fixo que ou fica apertado em
+          telas largas ou colado demais em telas estreitas. */}
+      <div className="mt-10 flex justify-center lg:absolute lg:inset-y-0 lg:right-6 lg:mt-0 lg:items-center lg:justify-end">
+        <ScrollReveal from="bottom" delay={150}>
+          <BackToTopButton />
+        </ScrollReveal>
+      </div>
     </section>
   );
 }
@@ -332,7 +364,10 @@ function FinalCta() {
 function LandingFooter() {
   return (
     <footer className="border-t border-border/60">
-      <div className="mx-auto flex w-full max-w-6xl flex-col items-center justify-between gap-4 px-6 py-8 text-sm text-muted-foreground sm:flex-row">
+      <ScrollReveal
+        from="bottom"
+        className="mx-auto flex w-full max-w-6xl flex-col items-center justify-between gap-4 px-6 py-8 text-sm text-muted-foreground sm:flex-row"
+      >
         <span className="font-heading font-semibold text-foreground">PiperFlow</span>
         <span>© {new Date().getFullYear()} PiperFlow CRM.</span>
         <div className="flex items-center gap-4">
@@ -343,7 +378,7 @@ function LandingFooter() {
             Criar conta
           </Link>
         </div>
-      </div>
+      </ScrollReveal>
     </footer>
   );
 }
