@@ -23,7 +23,7 @@ export function PipelineColumn({
   const { setNodeRef, isOver } = useDroppable({ id: stageId });
 
   return (
-    <div className="flex w-72 shrink-0 flex-col rounded-xl bg-muted/40">
+    <div className="flex w-72 shrink-0 snap-start flex-col rounded-xl bg-muted/40">
       <div className="flex items-center justify-between px-3 py-2.5">
         <h2 className="text-sm font-medium">{label}</h2>
         <span className="text-xs text-muted-foreground">{deals.length}</span>

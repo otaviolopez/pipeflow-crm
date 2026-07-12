@@ -22,6 +22,7 @@ import type { Deal, DealStage } from "@/lib/pipeline/types";
 
 import { DealCardSkeleton } from "./deal-card-skeleton";
 import { DealCardVisual } from "./deal-card-visual";
+import { HorizontalScrollFade } from "./horizontal-scroll-fade";
 import { LostConfirmDialog } from "./lost-confirm-dialog";
 import { NewDealDialog } from "./new-deal-dialog";
 import { PipelineColumn } from "./pipeline-column";
@@ -183,20 +184,30 @@ export function PipelineBoard() {
 
   return (
     <div className="flex flex-1 flex-col gap-4 overflow-hidden p-6">
-      <div className="flex items-center justify-between gap-2">
+      <div className="flex items-center gap-2">
         <h1 className="text-2xl font-semibold tracking-tight">Pipeline de Vendas</h1>
-        <Button onClick={() => setIsNewDealOpen(true)} disabled={isLoading}>
-          <Plus />
-          Novo negócio
-        </Button>
       </div>
 
+      {/* fixed (não sticky/relative): fica ancorado no canto superior
+          direito da tela o tempo todo, mesmo se a página ganhar scroll
+          vertical — não faz parte do fluxo normal do header. top-20 (abaixo
+          da topbar de 56px + folga) evita sobrepor o dropdown de
+          avatar/tema que já vive lá. */}
+      <Button
+        onClick={() => setIsNewDealOpen(true)}
+        disabled={isLoading}
+        className="fixed top-20 right-6 z-40 shadow-lg"
+      >
+        <Plus />
+        Novo negócio
+      </Button>
+
       {isLoading ? (
-        <div className="flex flex-1 gap-4 overflow-x-auto pb-2">
+        <HorizontalScrollFade>
           {STAGES.map((stage) => (
             <div
               key={stage.id}
-              className="flex w-72 shrink-0 flex-col gap-2 rounded-xl bg-muted/40 p-2"
+              className="flex w-72 shrink-0 snap-start flex-col gap-2 rounded-xl bg-muted/40 p-2"
             >
               <span className="px-1 py-1.5 text-sm font-medium text-muted-foreground">
                 {stage.label}
@@ -205,7 +216,7 @@ export function PipelineBoard() {
               <DealCardSkeleton />
             </div>
           ))}
-        </div>
+        </HorizontalScrollFade>
       ) : (
         <DndContext
           sensors={sensors}
@@ -214,7 +225,7 @@ export function PipelineBoard() {
           onDragOver={handleDragOver}
           onDragEnd={handleDragEnd}
         >
-          <div className="flex flex-1 gap-4 overflow-x-auto pb-2">
+          <HorizontalScrollFade>
             {STAGES.map((stage) => (
               <PipelineColumn
                 key={stage.id}
@@ -224,7 +235,7 @@ export function PipelineBoard() {
                 onMoveTo={moveDeal}
               />
             ))}
-          </div>
+          </HorizontalScrollFade>
           <DragOverlay>
             {activeDeal ? (
               <DealCardVisual deal={activeDeal} onMoveTo={() => {}} interactive={false} />

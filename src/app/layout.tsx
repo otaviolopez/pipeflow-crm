@@ -29,7 +29,14 @@ export default function RootLayout({
     // script antes da hidratação; sem isso o React acusa mismatch falso.
     <html
       lang="pt-BR"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      // overflow-x-hidden direto no <html> (elemento raiz de scroll de
+      // verdade) — testado empiricamente: colocar só no <body> e confiar na
+      // propagação body->viewport não bloqueou o scroll horizontal de fato
+      // (window.scrollTo ainda conseguia rolar). Cards do ScrollReveal
+      // ainda não revelados ficam deslocados ±64px pra fora da tela
+      // esperando a hora de entrar; sem cortar isso, contam como largura
+      // rolável da página.
+      className={`${geistSans.variable} ${geistMono.variable} h-full overflow-x-hidden antialiased`}
       suppressHydrationWarning
     >
       <body className="flex min-h-full flex-col">

@@ -6,6 +6,17 @@ import { cn } from "@/lib/utils";
 
 type Direction = "left" | "right" | "bottom";
 
+// Abaixo desse delta (px) uma variação de scrollY é tratada como ruído, não
+// como intenção real de subir/descer — existe pra ignorar o "quique" do
+// overscroll elástico no fim da página, que senão fica alternando a
+// direção detectada a cada frame e faz o último bloco tremer.
+const SCROLL_NOISE_DEADZONE_PX = 4;
+
+// Tempo que a proporção visível precisa ficar abaixo de 30% (rolando pra
+// cima) antes de recolher de fato — filtra blips de 1 frame do observer
+// (mesma causa do tremor: um quique momentâneo cruza o threshold e volta).
+const HIDE_DEBOUNCE_MS = 120;
+
 // Efeito de entrada: o filho aparece (opacidade + deslize) assim que entra
 // no viewport ao rolar para baixo, e continua visível enquanto o usuário
 // segue descendo — mesmo depois que o elemento sai da tela por cima. Ele só
@@ -29,19 +40,18 @@ export function ScrollReveal({
   const isVisibleRef = React.useRef(isVisible);
   isVisibleRef.current = isVisible;
 
-  // Direção do scroll rastreada localmente por instância (ref, não estado
-  // de módulo) — cada componente cuida do próprio listener e o limpa junto
-  // com o efeito, então não fica listener órfão sobrevivendo a hot-reload
-  // ou a remontagens do componente.
   const scrollDirectionRef = React.useRef<"up" | "down">("down");
   const lastScrollYRef = React.useRef(0);
+  const hideTimeoutRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
 
   React.useEffect(() => {
     lastScrollYRef.current = window.scrollY;
 
     function handleScroll() {
       const current = window.scrollY;
-      scrollDirectionRef.current = current < lastScrollYRef.current ? "up" : "down";
+      const delta = current - lastScrollYRef.current;
+      if (Math.abs(delta) < SCROLL_NOISE_DEADZONE_PX) return;
+      scrollDirectionRef.current = delta < 0 ? "up" : "down";
       lastScrollYRef.current = current;
     }
 
@@ -53,23 +63,42 @@ export function ScrollReveal({
     const node = ref.current;
     if (!node) return;
 
+    function cancelPendingHide() {
+      if (hideTimeoutRef.current !== null) {
+        clearTimeout(hideTimeoutRef.current);
+        hideTimeoutRef.current = null;
+      }
+    }
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting && !isVisibleRef.current) {
+          cancelPendingHide();
           setIsVisible(true);
         } else if (
           isVisibleRef.current &&
           entry.intersectionRatio < 0.3 &&
-          scrollDirectionRef.current === "up"
+          scrollDirectionRef.current === "up" &&
+          hideTimeoutRef.current === null
         ) {
-          setIsVisible(false);
+          hideTimeoutRef.current = setTimeout(() => {
+            hideTimeoutRef.current = null;
+            setIsVisible(false);
+          }, HIDE_DEBOUNCE_MS);
+        } else if (entry.intersectionRatio >= 0.3 || scrollDirectionRef.current === "down") {
+          // A proporção voltou a subir (ou a direção virou "descendo") antes
+          // do debounce terminar — cancela o recolhimento agendado.
+          cancelPendingHide();
         }
       },
       { threshold: [0, 0.3] }
     );
 
     observer.observe(node);
-    return () => observer.disconnect();
+    return () => {
+      observer.disconnect();
+      cancelPendingHide();
+    };
   }, []);
 
   const hiddenClass =

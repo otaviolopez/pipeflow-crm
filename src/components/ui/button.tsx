@@ -44,12 +44,22 @@ function Button({
   className,
   variant = "default",
   size = "default",
+  render,
+  nativeButton,
   ...props
 }: ButtonPrimitive.Props & VariantProps<typeof buttonVariants>) {
   return (
     <ButtonPrimitive
       data-slot="button"
       className={cn(buttonVariants({ variant, size, className }))}
+      render={render}
+      // Base UI assume nativeButton=true (o elemento renderizado é um
+      // <button> de verdade) por padrão. Quando o caller passa `render`
+      // pra trocar por <Link>/<a> (navegação, não submit de formulário),
+      // isso deixa de ser verdade — sem nativeButton={false} a lib tenta
+      // aplicar semântica de <button> nativo num <a>, o que gera o aviso
+      // "expected a native <button>" e comportamento de teclado incorreto.
+      nativeButton={nativeButton ?? !render}
       {...props}
     />
   )
