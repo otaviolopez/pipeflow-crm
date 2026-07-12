@@ -13,9 +13,9 @@ export const metadata: Metadata = { title: "Entrar — PiperFlow" };
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string; notice?: string }>;
+  searchParams: Promise<{ error?: string; notice?: string; inviteToken?: string }>;
 }) {
-  const { error, notice } = await searchParams;
+  const { error, notice, inviteToken } = await searchParams;
 
   return (
     <AuthShell
@@ -34,6 +34,9 @@ export default async function LoginPage({
       }
     >
       <form className="flex flex-col gap-4">
+        {inviteToken && (
+          <input type="hidden" name="inviteToken" value={inviteToken} />
+        )}
         {error && (
           <p
             role="alert"

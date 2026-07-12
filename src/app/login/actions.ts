@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { acceptInviteForCurrentUser } from "@/lib/workspace/invites";
 
 export async function login(formData: FormData) {
   const supabase = await createClient();
@@ -24,6 +25,18 @@ export async function login(formData: FormData) {
       );
     }
     redirect(`/login?error=${encodeURIComponent("E-mail ou senha incorretos.")}`);
+  }
+
+  // Login veio do fluxo de convite (/invite/[token] com cadastro pendente de
+  // confirmação de e-mail) — aceita o convite agora que a sessão existe.
+  const inviteToken = formData.get("inviteToken");
+  if (typeof inviteToken === "string" && inviteToken) {
+    try {
+      await acceptInviteForCurrentUser(inviteToken);
+    } catch {
+      // Convite expirou/inválido: login continua normalmente. Sem nenhum
+      // workspace, o AppLayout leva o usuário para /onboarding.
+    }
   }
 
   revalidatePath("/", "layout");

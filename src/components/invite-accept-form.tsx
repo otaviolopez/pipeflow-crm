@@ -1,33 +1,44 @@
 "use client";
 
 import * as React from "react";
-import { useRouter } from "next/navigation";
-import { toast } from "sonner";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { loginAndAcceptInvite, signupAndAcceptInvite } from "@/app/invite/[token]/actions";
 
 // Papéis do banco ficam em inglês (CLAUDE.md); a tradução é só de exibição.
 const roleLabels = { admin: "Admin", member: "Membro" } as const;
 
 export function InviteAcceptForm({
+  token,
   role,
 }: {
+  token: string;
   role: keyof typeof roleLabels;
 }) {
-  const router = useRouter();
   const [isPending, startTransition] = React.useTransition();
+  const [error, setError] = React.useState<string | null>(null);
 
-  function accept(event: React.FormEvent<HTMLFormElement>) {
+  function acceptWithSignup(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    startTransition(() => {
-      // TODO(M9): trocar por Server Action que chama `accept_invite`
-      // (supabase/schema.sql) e cria/loga o usuário de verdade.
-      toast.success("Convite aceito. Bem-vindo ao workspace!");
-      router.push("/pipeline");
+    setError(null);
+    const formData = new FormData(event.currentTarget);
+    startTransition(async () => {
+      const result = await signupAndAcceptInvite(token, formData);
+      if (result?.error) setError(result.error);
+    });
+  }
+
+  function acceptWithLogin(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setError(null);
+    const formData = new FormData(event.currentTarget);
+    startTransition(async () => {
+      const result = await loginAndAcceptInvite(token, formData);
+      if (result?.error) setError(result.error);
     });
   }
 
@@ -36,6 +47,15 @@ export function InviteAcceptForm({
       <Badge variant="secondary" className="w-fit">
         Papel: {roleLabels[role]}
       </Badge>
+
+      {error && (
+        <p
+          role="alert"
+          className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive"
+        >
+          {error}
+        </p>
+      )}
 
       <Tabs defaultValue="create">
         <TabsList className="w-full">
@@ -48,12 +68,13 @@ export function InviteAcceptForm({
         </TabsList>
 
         <TabsContent value="create">
-          <form onSubmit={accept} className="flex flex-col gap-4 pt-4">
+          <form onSubmit={acceptWithSignup} className="flex flex-col gap-4 pt-4">
             <FieldGroup>
               <Field>
                 <FieldLabel htmlFor="create-email">E-mail</FieldLabel>
                 <Input
                   id="create-email"
+                  name="email"
                   type="email"
                   autoComplete="email"
                   required
@@ -63,6 +84,7 @@ export function InviteAcceptForm({
                 <FieldLabel htmlFor="create-password">Senha</FieldLabel>
                 <Input
                   id="create-password"
+                  name="password"
                   type="password"
                   autoComplete="new-password"
                   minLength={6}
@@ -77,12 +99,13 @@ export function InviteAcceptForm({
         </TabsContent>
 
         <TabsContent value="login">
-          <form onSubmit={accept} className="flex flex-col gap-4 pt-4">
+          <form onSubmit={acceptWithLogin} className="flex flex-col gap-4 pt-4">
             <FieldGroup>
               <Field>
                 <FieldLabel htmlFor="login-email">E-mail</FieldLabel>
                 <Input
                   id="login-email"
+                  name="email"
                   type="email"
                   autoComplete="email"
                   required
@@ -92,6 +115,7 @@ export function InviteAcceptForm({
                 <FieldLabel htmlFor="login-password">Senha</FieldLabel>
                 <Input
                   id="login-password"
+                  name="password"
                   type="password"
                   autoComplete="current-password"
                   required

@@ -25,6 +25,7 @@ import {
   FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { createWorkspace } from "@/lib/workspace/actions";
 
 const onboardingSchema = z.object({
   workspaceName: z.string().trim().min(2, "Informe um nome para o workspace."),
@@ -58,16 +59,21 @@ export function OnboardingWizard() {
   }
 
   function finish(values: OnboardingValues) {
-    startTransition(() => {
-      // TODO(M9): trocar por Server Action que cria o workspace de verdade e
-      // dispara os convites via Resend. Por enquanto a tela é só visual
-      // (plan.md, Fase 1 — interface com dados mockados).
+    startTransition(async () => {
+      const result = await createWorkspace(values.workspaceName);
+      if (result.error) {
+        toast.error(result.error);
+        return;
+      }
+
+      // Convites por e-mail via Resend só são disparados no M12 — aqui só
+      // avisamos que dá para convidar depois em Configurações > Equipe.
       const pendingInvites = values.invites.filter(
         (invite) => invite.email.trim() !== ""
       );
       toast.success(
         pendingInvites.length > 0
-          ? `Workspace "${values.workspaceName}" criado. ${pendingInvites.length} convite(s) serão enviados.`
+          ? `Workspace "${values.workspaceName}" criado. Convide seus colaboradores em Configurações > Equipe.`
           : `Workspace "${values.workspaceName}" criado.`
       );
       router.push("/pipeline");

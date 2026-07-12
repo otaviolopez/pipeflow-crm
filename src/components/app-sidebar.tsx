@@ -35,9 +35,8 @@ import {
   SidebarMenuSubItem,
   SidebarRail,
 } from "@/components/ui/sidebar"
-
-// Workspaces mockados até o M9 conectar o switcher aos dados reais do usuário.
-const mockWorkspaces = ["Minha Empresa", "Agência Demo"]
+import { switchWorkspace } from "@/lib/workspace/actions"
+import type { WorkspaceSummary } from "@/lib/workspace/session"
 
 const mainNav = [
   { title: "Pipeline", href: "/pipeline", icon: SquareKanban },
@@ -51,11 +50,25 @@ const settingsNav = [
   { title: "Plano", href: "/settings/billing" },
 ]
 
-export function AppSidebar() {
+export function AppSidebar({
+  workspaces,
+  activeWorkspaceId,
+}: {
+  workspaces: WorkspaceSummary[]
+  activeWorkspaceId: string
+}) {
   const pathname = usePathname()
-  const [activeWorkspace, setActiveWorkspace] = React.useState(
-    mockWorkspaces[0]
-  )
+  const [isPending, startTransition] = React.useTransition()
+  const activeWorkspace =
+    workspaces.find((workspace) => workspace.id === activeWorkspaceId) ??
+    workspaces[0]
+
+  function handleSwitch(workspaceId: string) {
+    if (workspaceId === activeWorkspace.id || isPending) return
+    startTransition(async () => {
+      await switchWorkspace(workspaceId)
+    })
+  }
 
   return (
     <Sidebar collapsible="icon">
@@ -76,7 +89,7 @@ export function AppSidebar() {
                 </div>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-medium">
-                    {activeWorkspace}
+                    {activeWorkspace.name}
                   </span>
                   <span className="truncate text-xs text-sidebar-foreground/70">
                     Workspace
@@ -92,14 +105,14 @@ export function AppSidebar() {
                 {/* Base UI exige GroupLabel dentro de Menu.Group */}
                 <DropdownMenuGroup>
                   <DropdownMenuLabel>Trocar workspace</DropdownMenuLabel>
-                  {mockWorkspaces.map((workspace) => (
+                  {workspaces.map((workspace) => (
                     <DropdownMenuItem
-                      key={workspace}
-                      onClick={() => setActiveWorkspace(workspace)}
+                      key={workspace.id}
+                      onClick={() => handleSwitch(workspace.id)}
                     >
                       <Building2 />
-                      {workspace}
-                      {workspace === activeWorkspace && (
+                      {workspace.name}
+                      {workspace.id === activeWorkspace.id && (
                         <Check className="ml-auto" />
                       )}
                     </DropdownMenuItem>

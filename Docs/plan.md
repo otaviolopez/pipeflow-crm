@@ -234,13 +234,13 @@ confirmar que a segurança funciona antes de conectar qualquer tela.
 sessão e workspace.
 
 **Entregas:**
-- [ ] Server Action `createWorkspace` (o trigger do M8 já cria o criador
+- [x] Server Action `createWorkspace` (o trigger do M8 já cria o criador
       como admin automaticamente)
-- [ ] Query/Server Action para listar os workspaces do usuário e trocar o
+- [x] Query/Server Action para listar os workspaces do usuário e trocar o
       ativo, alimentando o switcher do M1
-- [ ] Conectar `/onboarding` para criar o workspace de verdade e
+- [x] Conectar `/onboarding` para criar o workspace de verdade e
       redirecionar para `/pipeline`
-- [ ] Conectar `/invite/[token]` à função `accept_invite` (M8)
+- [x] Conectar `/invite/[token]` à função `accept_invite` (M8)
 
 **Commit final:** `feat(backend): auth, workspaces e onboarding conectados ao Supabase`
 
