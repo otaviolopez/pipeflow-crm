@@ -307,7 +307,13 @@ function SidebarInset({ className, ...props }: React.ComponentProps<"main">) {
     <main
       data-slot="sidebar-inset"
       className={cn(
-        "relative flex w-full flex-1 flex-col bg-background md:peer-data-[variant=inset]:m-2 md:peer-data-[variant=inset]:ml-0 md:peer-data-[variant=inset]:rounded-xl md:peer-data-[variant=inset]:shadow-sm md:peer-data-[variant=inset]:peer-data-[state=collapsed]:ml-2",
+        // min-w-0: sem isso, este item flex (irmão da sidebar num flex row)
+        // não encolhe abaixo da largura mínima do próprio conteúdo — uma
+        // página com conteúdo intrinsecamente largo (ex: pipeline com 6
+        // colunas fixas) empurra o <main> pra além da viewport inteira,
+        // e qualquer elemento posicionado "right-*" dentro dele calcula a
+        // posição errada (fica fora da área visível, cortado sem aviso).
+        "relative flex w-full min-w-0 flex-1 flex-col bg-background md:peer-data-[variant=inset]:m-2 md:peer-data-[variant=inset]:ml-0 md:peer-data-[variant=inset]:rounded-xl md:peer-data-[variant=inset]:shadow-sm md:peer-data-[variant=inset]:peer-data-[state=collapsed]:ml-2",
         className
       )}
       {...props}

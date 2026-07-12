@@ -134,7 +134,10 @@ function Hero() {
         }}
       />
 
-      <div className="relative mx-auto grid w-full max-w-6xl gap-16 px-6 py-24 lg:grid-cols-[1.1fr_0.9fr] lg:items-center lg:py-32">
+      {/* zoom (não transform:scale) porque precisa aumentar o espaço real
+          ocupado no layout — é isso que empurra a seção "Feito só pra
+          vender" pra baixo do fold, não só um efeito visual por cima. */}
+      <div className="relative mx-auto grid w-full max-w-6xl gap-16 px-6 py-24 [zoom:1.2] lg:grid-cols-[1.1fr_0.9fr] lg:items-center lg:py-32">
         <div className="flex flex-col gap-6">
           <span
             className="w-fit animate-in fade-in-0 slide-in-from-bottom-2 rounded-full border border-border px-3 py-1 text-xs font-medium text-muted-foreground fill-mode-both duration-700"
