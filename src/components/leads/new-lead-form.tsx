@@ -1,5 +1,6 @@
 "use client";
 
+import * as React from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -11,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { addLead } from "@/lib/leads/store";
+import { createLead } from "@/lib/leads/actions";
 
 // Só o nome é obrigatório — PRD, Seção 6.1: "formulário com apenas nome
 // obrigatório para não perder tempo antes de começar a vender" (User Story
@@ -28,6 +29,7 @@ type NewLeadValues = z.infer<typeof newLeadSchema>;
 
 export function NewLeadForm() {
   const router = useRouter();
+  const [isPending, startTransition] = React.useTransition();
 
   const form = useForm<NewLeadValues>({
     resolver: zodResolver(newLeadSchema),
@@ -35,15 +37,23 @@ export function NewLeadForm() {
   });
 
   function onSubmit(values: NewLeadValues) {
-    const lead = addLead({
-      name: values.name,
-      email: values.email || null,
-      phone: values.phone || null,
-      company: values.company || null,
-      roleTitle: values.roleTitle || null,
+    startTransition(async () => {
+      const result = await createLead({
+        name: values.name,
+        email: values.email || null,
+        phone: values.phone || null,
+        company: values.company || null,
+        roleTitle: values.roleTitle || null,
+      });
+
+      if (result.error) {
+        toast.error(result.error);
+        return;
+      }
+
+      toast.success("Lead adicionado.");
+      router.push(`/leads/${result.leadId}`);
     });
-    toast.success("Lead adicionado.");
-    router.push(`/leads/${lead.id}`);
   }
 
   return (
@@ -91,7 +101,9 @@ export function NewLeadForm() {
               <Button type="button" variant="outline" render={<Link href="/leads" />}>
                 Cancelar
               </Button>
-              <Button type="submit">Salvar lead</Button>
+              <Button type="submit" disabled={isPending}>
+                {isPending ? "Salvando..." : "Salvar lead"}
+              </Button>
             </div>
           </form>
         </CardContent>

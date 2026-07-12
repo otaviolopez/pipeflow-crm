@@ -8,51 +8,54 @@ import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { createActivity, updateLeadStatus } from "@/lib/leads/actions";
 import { formatCurrencyBRL } from "@/lib/pipeline/format";
 import { MOCK_DEALS } from "@/lib/pipeline/mock-data";
 import { STAGES } from "@/lib/pipeline/types";
-import {
-  addActivity,
-  getActivitiesForLead,
-  getLeadById,
-  updateLeadStatus,
-} from "@/lib/leads/store";
-import type { ActivityType, Lead } from "@/lib/leads/types";
+import type { Activity, ActivityType, Lead } from "@/lib/leads/types";
 
 import { ActivityTimeline } from "./activity-timeline";
 import { LeadStatusEditableBadge } from "./lead-status-editable-badge";
 import { RegisterActivitySheet } from "./register-activity-sheet";
 
-export function LeadDetailView({ leadId }: { leadId: string }) {
-  // O componente remonta a cada troca de lead (key={leadId} em page.tsx),
-  // então o estado inicial já nasce correto sem precisar de um useEffect de
-  // sincronização (react.dev/learn/you-might-not-need-an-effect).
-  const [lead, setLead] = React.useState<Lead | null>(() => getLeadById(leadId) ?? null);
-  const [activities, setActivities] = React.useState(() => getActivitiesForLead(leadId));
+export function LeadDetailView({
+  leadId,
+  initialLead,
+  initialActivities,
+}: {
+  leadId: string;
+  initialLead: Lead | null;
+  initialActivities: Activity[];
+}) {
+  const [isPending, startTransition] = React.useTransition();
   const [isSheetOpen, setIsSheetOpen] = React.useState(false);
 
   function handleStatusChange(status: Lead["status"]) {
-    if (!lead) return;
-    updateLeadStatus(lead.id, status);
-    setLead({ ...lead, status });
-    toast.success("Status atualizado.");
+    startTransition(async () => {
+      const result = await updateLeadStatus(leadId, status);
+      if (result.error) {
+        toast.error(result.error);
+        return;
+      }
+      toast.success("Status atualizado.");
+    });
   }
 
   function handleRegisterActivity(input: { type: ActivityType; description: string }) {
-    const activity = addActivity({
-      leadId,
-      type: input.type,
-      description: input.description,
-      // Mock: em produção vem da sessão autenticada (Supabase Auth).
-      authorName: "Você",
+    startTransition(async () => {
+      const result = await createActivity({ leadId, ...input });
+      if (result.error) {
+        toast.error(result.error);
+        return;
+      }
+      toast.success("Atividade registrada.");
+      setIsSheetOpen(false);
     });
-    setActivities((prev) => [activity, ...prev]);
-    return activity;
   }
 
   // Estado de erro 404 — lead não existe ou não pertence ao workspace ativo
   // (PRD, Seção 9.3).
-  if (lead === null) {
+  if (initialLead === null) {
     return (
       <div className="flex flex-1 flex-col items-center justify-center gap-3 p-6 text-center">
         <FileQuestion className="size-10 text-muted-foreground" />
@@ -62,6 +65,7 @@ export function LeadDetailView({ leadId }: { leadId: string }) {
     );
   }
 
+  const lead = initialLead;
   const linkedDeals = MOCK_DEALS.filter((deal) => deal.leadName === lead.company);
   const subtitle = [lead.roleTitle, lead.company].filter(Boolean).join(" · ");
 
@@ -87,7 +91,7 @@ export function LeadDetailView({ leadId }: { leadId: string }) {
       <div className="grid flex-1 grid-cols-1 gap-6 lg:grid-cols-[1fr_320px]">
         <div className="flex flex-col gap-3">
           <h2 className="text-sm font-medium text-muted-foreground">Timeline de atividades</h2>
-          <ActivityTimeline activities={activities} />
+          <ActivityTimeline activities={initialActivities} />
         </div>
 
         <div className="flex flex-col gap-3">
@@ -121,6 +125,7 @@ export function LeadDetailView({ leadId }: { leadId: string }) {
         open={isSheetOpen}
         onOpenChange={setIsSheetOpen}
         onRegister={handleRegisterActivity}
+        isPending={isPending}
       />
     </div>
   );

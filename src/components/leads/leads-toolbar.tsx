@@ -13,7 +13,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { OWNERS } from "@/lib/leads/types";
 import type { LeadStatus } from "@/lib/leads/types";
 
 const STATUS_LABELS: Record<"all" | LeadStatus, string> = {
@@ -30,6 +29,7 @@ export function LeadsToolbar({
   onStatusChange,
   owner,
   onOwnerChange,
+  owners,
   createdFrom,
   onCreatedFromChange,
 }: {
@@ -40,6 +40,7 @@ export function LeadsToolbar({
   onStatusChange: (value: "all" | LeadStatus) => void;
   owner: string;
   onOwnerChange: (value: string) => void;
+  owners: string[];
   createdFrom: Date | undefined;
   onCreatedFromChange: (value: Date | undefined) => void;
 }) {
@@ -84,7 +85,7 @@ export function LeadsToolbar({
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="all">Todos os responsáveis</SelectItem>
-          {OWNERS.map((name) => (
+          {owners.map((name) => (
             <SelectItem key={name} value={name}>
               {name}
             </SelectItem>

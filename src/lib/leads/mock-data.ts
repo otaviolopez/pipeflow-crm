@@ -1,5 +1,10 @@
-import { ACTIVITY_TYPES, OWNERS } from "./types";
+import { ACTIVITY_TYPES } from "./types";
 import type { Activity, ActivityType, Lead } from "./types";
+
+// Removido de types.ts no M10 (dados reais de responsável vêm de
+// public.profiles) — mantido só aqui porque o dashboard (M14) ainda consome
+// este mock.
+const OWNERS = ["Ana Souza", "Bruno Lima", "Carla Dias"] as const;
 
 // Mesmas 11 empresas usadas no mock do pipeline (src/lib/pipeline/mock-data.ts)
 // — só para o dado mockado contar uma história coerente entre as duas telas.

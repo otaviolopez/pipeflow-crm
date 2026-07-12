@@ -12,6 +12,7 @@ export type Lead = {
   status: LeadStatus;
   ownerName: string;
   createdAt: string; // ISO
+  lastActivityAt?: string | null; // preenchido só na listagem (/leads)
 };
 
 export type ActivityType = "call" | "email" | "meeting" | "note";
@@ -31,10 +32,6 @@ export const ACTIVITY_TYPES: { id: ActivityType; label: string }[] = [
   { id: "meeting", label: "Reunião" },
   { id: "note", label: "Nota" },
 ];
-
-// Mesmos 3 responsáveis usados no mock do pipeline (M4), para o dado mockado
-// parecer um único workspace coerente.
-export const OWNERS = ["Ana Souza", "Bruno Lima", "Carla Dias"] as const;
 
 // Limite do plano Free (PRD, Seção 6.6) — checado aqui só para exibir o
 // banner; a validação de verdade é sempre no servidor (CLAUDE.md).

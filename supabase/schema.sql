@@ -44,6 +44,12 @@ create table if not exists public.invites (
   created_at timestamptz not null default now()
 );
 
+create table if not exists public.profiles (
+  id uuid primary key references auth.users (id) on delete cascade,
+  name text not null,
+  created_at timestamptz not null default now()
+);
+
 create table if not exists public.leads (
   id uuid primary key default gen_random_uuid(),
   workspace_id uuid not null references public.workspaces (id) on delete cascade,
@@ -161,6 +167,37 @@ create trigger on_workspace_created
   after insert on public.workspaces
   for each row execute function public.handle_new_workspace();
 
+-- Toda vez que um usuário se cadastra no Supabase Auth, cria automaticamente
+-- a linha correspondente em public.profiles — é dali que leads/deals/
+-- activities resolvem o nome de exibição de owner_id/author_id, já que
+-- auth.users fica num schema protegido e não deve ser consultado direto pela
+-- aplicação (ver memória do projeto sobre a descoberta pré-M10).
+create or replace function public.handle_new_user()
+returns trigger
+language plpgsql
+security definer
+set search_path = ''
+as $$
+begin
+  insert into public.profiles (id, name)
+  values (new.id, split_part(new.email, '@', 1));
+  return new;
+end;
+$$;
+
+drop trigger if exists on_auth_user_created on auth.users;
+create trigger on_auth_user_created
+  after insert on auth.users
+  for each row execute function public.handle_new_user();
+
+-- Backfill: usuários criados antes deste trigger existir (ex.: contas de
+-- teste do M8/M9) ainda não têm profile — roda uma vez e é seguro repetir
+-- (on conflict do nothing) se este arquivo for executado de novo.
+insert into public.profiles (id, name)
+select id, split_part(email, '@', 1)
+from auth.users
+on conflict (id) do nothing;
+
 -- Aceitar convite (POST /api/invites/:token/accept da Seção 12 do PRD):
 -- valida o token, cria a associação em workspace_members e marca o convite
 -- como aceito — tudo em uma única operação atômica.
@@ -210,81 +247,121 @@ alter table public.invites enable row level security;
 alter table public.leads enable row level security;
 alter table public.deals enable row level security;
 alter table public.activities enable row level security;
+alter table public.profiles enable row level security;
+
+-- Cada "create policy" é precedido de "drop policy if exists" — sem isso,
+-- rodar este arquivo de novo (prática do projeto a cada milestone que mexe
+-- no schema) falha com "policy already exists" no primeiro create policy,
+-- como aconteceu ao tentar aplicar as mudanças do M10 por cima do M8/M9.
 
 -- workspaces
+drop policy if exists "workspaces: select as member" on public.workspaces;
 create policy "workspaces: select as member" on public.workspaces
   for select to authenticated
   using ( (select public.is_workspace_member(id)) );
 
+drop policy if exists "workspaces: insert self" on public.workspaces;
 create policy "workspaces: insert self" on public.workspaces
   for insert to authenticated
   with check ( true );
 
+drop policy if exists "workspaces: update as admin" on public.workspaces;
 create policy "workspaces: update as admin" on public.workspaces
   for update to authenticated
   using ( (select public.is_workspace_admin(id)) )
   with check ( (select public.is_workspace_admin(id)) );
 
 -- workspace_members
+drop policy if exists "workspace_members: select as member" on public.workspace_members;
 create policy "workspace_members: select as member" on public.workspace_members
   for select to authenticated
   using ( (select public.is_workspace_member(workspace_id)) );
 
+drop policy if exists "workspace_members: insert as admin" on public.workspace_members;
 create policy "workspace_members: insert as admin" on public.workspace_members
   for insert to authenticated
   with check ( (select public.is_workspace_admin(workspace_id)) );
 
+drop policy if exists "workspace_members: update as admin" on public.workspace_members;
 create policy "workspace_members: update as admin" on public.workspace_members
   for update to authenticated
   using ( (select public.is_workspace_admin(workspace_id)) )
   with check ( (select public.is_workspace_admin(workspace_id)) );
 
+drop policy if exists "workspace_members: delete as admin" on public.workspace_members;
 create policy "workspace_members: delete as admin" on public.workspace_members
   for delete to authenticated
   using ( (select public.is_workspace_admin(workspace_id)) );
 
 -- invites (tela /settings/team é Admin-only — ver Seção 9.1 do PRD)
+drop policy if exists "invites: select as admin" on public.invites;
 create policy "invites: select as admin" on public.invites
   for select to authenticated
   using ( (select public.is_workspace_admin(workspace_id)) );
 
+drop policy if exists "invites: insert as admin" on public.invites;
 create policy "invites: insert as admin" on public.invites
   for insert to authenticated
   with check ( (select public.is_workspace_admin(workspace_id)) );
 
 -- leads (qualquer membro do workspace tem CRUD, sem distinção de papel)
+drop policy if exists "leads: select as member" on public.leads;
 create policy "leads: select as member" on public.leads
   for select to authenticated
   using ( (select public.is_workspace_member(workspace_id)) );
 
+drop policy if exists "leads: insert as member" on public.leads;
 create policy "leads: insert as member" on public.leads
   for insert to authenticated
   with check ( (select public.is_workspace_member(workspace_id)) );
 
+drop policy if exists "leads: update as member" on public.leads;
 create policy "leads: update as member" on public.leads
   for update to authenticated
   using ( (select public.is_workspace_member(workspace_id)) )
   with check ( (select public.is_workspace_member(workspace_id)) );
 
 -- deals
+drop policy if exists "deals: select as member" on public.deals;
 create policy "deals: select as member" on public.deals
   for select to authenticated
   using ( (select public.is_workspace_member(workspace_id)) );
 
+drop policy if exists "deals: insert as member" on public.deals;
 create policy "deals: insert as member" on public.deals
   for insert to authenticated
   with check ( (select public.is_workspace_member(workspace_id)) );
 
+drop policy if exists "deals: update as member" on public.deals;
 create policy "deals: update as member" on public.deals
   for update to authenticated
   using ( (select public.is_workspace_member(workspace_id)) )
   with check ( (select public.is_workspace_member(workspace_id)) );
 
 -- activities (timeline: apenas criação e leitura no MVP, sem edição/remoção)
+drop policy if exists "activities: select as member" on public.activities;
 create policy "activities: select as member" on public.activities
   for select to authenticated
   using ( (select public.is_workspace_member(workspace_id)) );
 
+drop policy if exists "activities: insert as member" on public.activities;
 create policy "activities: insert as member" on public.activities
   for insert to authenticated
   with check ( (select public.is_workspace_member(workspace_id)) );
+
+-- profiles (não é dado de negócio de um workspace específico — é a "lista
+-- telefônica" de nomes; visível apenas entre pessoas que compartilham pelo
+-- menos um workspace, nunca para usuários sem nenhum vínculo em comum)
+drop policy if exists "profiles: select as workspace-mate" on public.profiles;
+create policy "profiles: select as workspace-mate" on public.profiles
+  for select to authenticated
+  using (
+    id = (select auth.uid())
+    or exists (
+      select 1
+      from public.workspace_members mine
+      join public.workspace_members theirs on theirs.workspace_id = mine.workspace_id
+      where mine.user_id = (select auth.uid())
+        and theirs.user_id = public.profiles.id
+    )
+  );

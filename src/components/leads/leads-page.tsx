@@ -7,7 +7,6 @@ import { Plus, TriangleAlert } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { isCreatedOnOrAfter } from "@/lib/leads/format";
-import { getLeads } from "@/lib/leads/store";
 import { FREE_PLAN_LEAD_LIMIT, LEADS_PAGE_SIZE } from "@/lib/leads/types";
 import type { Lead, LeadStatus } from "@/lib/leads/types";
 
@@ -17,9 +16,16 @@ import { LeadsToolbar } from "./leads-toolbar";
 
 const LOADING_DELAY_MS = 600;
 
-export function LeadsPage() {
+export function LeadsPage({
+  leads,
+  owners,
+  isFreePlan,
+}: {
+  leads: Lead[];
+  owners: string[];
+  isFreePlan: boolean;
+}) {
   const [isLoading, setIsLoading] = React.useState(true);
-  const [leads] = React.useState<Lead[]>(() => getLeads());
   const [search, setSearch] = React.useState("");
   const [status, setStatus] = React.useState<"all" | LeadStatus>("all");
   const [owner, setOwner] = React.useState<string>("all");
@@ -66,7 +72,7 @@ export function LeadsPage() {
     setPage(1);
   }
 
-  const isAtFreeLimit = leads.length >= FREE_PLAN_LEAD_LIMIT;
+  const isAtFreeLimit = isFreePlan && leads.length >= FREE_PLAN_LEAD_LIMIT;
 
   return (
     <div className="flex flex-1 flex-col gap-4 p-6">
@@ -111,6 +117,7 @@ export function LeadsPage() {
         onStatusChange={(value) => updateFilter(setStatus, value)}
         owner={owner}
         onOwnerChange={(value) => updateFilter(setOwner, value)}
+        owners={owners}
         createdFrom={createdFrom}
         onCreatedFromChange={(value) => updateFilter(setCreatedFrom, value)}
       />

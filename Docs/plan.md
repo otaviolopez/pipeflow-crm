@@ -252,10 +252,15 @@ sessão e workspace.
 reais.
 
 **Entregas:**
-- [ ] Server Actions: criar/listar/atualizar lead (com busca e filtros
-      reais via `workspace_id`)
-- [ ] Server Actions: registrar atividade + buscar timeline de um lead
-- [ ] Validação server-side do limite de 50 leads no plano Free — nunca só
+- [x] Tabela `public.profiles` (id → nome de exibição) + trigger
+      `handle_new_user` em `auth.users`, com RLS própria — necessária porque
+      `owner_id`/`author_id` só guardam o `uuid` do usuário, e esse uuid não
+      tem nome legível em nenhuma tabela `public` hoje
+- [x] Server Actions: criar/listar/atualizar lead (com busca e filtros
+      reais via `workspace_id`, incluindo nome do responsável via join com
+      `profiles`)
+- [x] Server Actions: registrar atividade + buscar timeline de um lead
+- [x] Validação server-side do limite de 50 leads no plano Free — nunca só
       no frontend (regra do CLAUDE.md)
 
 **Commit final:** `feat(backend): CRUD de leads e timeline de atividades conectados`

@@ -14,7 +14,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { formatRelativeDate } from "@/lib/leads/format";
-import { getLastActivityAt } from "@/lib/leads/store";
 import type { Lead } from "@/lib/leads/types";
 
 import { LeadStatusBadge } from "./lead-status-badge";
@@ -107,28 +106,25 @@ export function LeadsTable({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {leads.map((lead) => {
-            const lastActivityAt = getLastActivityAt(lead.id);
-            return (
-              <TableRow key={lead.id}>
-                <TableCell>
-                  <Link href={`/leads/${lead.id}`} className="font-medium hover:underline">
-                    {lead.name}
-                  </Link>
-                </TableCell>
-                <TableCell className="text-muted-foreground">
-                  {lead.company ?? "—"}
-                </TableCell>
-                <TableCell>
-                  <LeadStatusBadge status={lead.status} />
-                </TableCell>
-                <TableCell className="text-muted-foreground">{lead.ownerName}</TableCell>
-                <TableCell className="text-muted-foreground">
-                  {lastActivityAt ? formatRelativeDate(lastActivityAt) : "Nenhuma atividade"}
-                </TableCell>
-              </TableRow>
-            );
-          })}
+          {leads.map((lead) => (
+            <TableRow key={lead.id}>
+              <TableCell>
+                <Link href={`/leads/${lead.id}`} className="font-medium hover:underline">
+                  {lead.name}
+                </Link>
+              </TableCell>
+              <TableCell className="text-muted-foreground">{lead.company ?? "—"}</TableCell>
+              <TableCell>
+                <LeadStatusBadge status={lead.status} />
+              </TableCell>
+              <TableCell className="text-muted-foreground">{lead.ownerName}</TableCell>
+              <TableCell className="text-muted-foreground">
+                {lead.lastActivityAt
+                  ? formatRelativeDate(lead.lastActivityAt)
+                  : "Nenhuma atividade"}
+              </TableCell>
+            </TableRow>
+          ))}
         </TableBody>
       </Table>
     </div>

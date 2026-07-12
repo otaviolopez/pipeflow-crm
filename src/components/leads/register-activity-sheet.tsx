@@ -3,7 +3,6 @@
 import * as React from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { toast } from "sonner";
 import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
@@ -18,7 +17,7 @@ import {
 } from "@/components/ui/sheet";
 import { Textarea } from "@/components/ui/textarea";
 import { ACTIVITY_TYPES } from "@/lib/leads/types";
-import type { Activity, ActivityType } from "@/lib/leads/types";
+import type { ActivityType } from "@/lib/leads/types";
 import { cn } from "@/lib/utils";
 
 const registerActivitySchema = z.object({
@@ -32,32 +31,32 @@ export function RegisterActivitySheet({
   open,
   onOpenChange,
   onRegister,
+  isPending,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onRegister: (input: { type: ActivityType; description: string }) => Activity;
+  onRegister: (input: { type: ActivityType; description: string }) => void;
+  isPending: boolean;
 }) {
   const form = useForm<RegisterActivityValues>({
     resolver: zodResolver(registerActivitySchema),
     defaultValues: { type: "call", description: "" },
   });
 
-  function handleOpenChange(nextOpen: boolean) {
-    if (!nextOpen) form.reset();
-    onOpenChange(nextOpen);
-  }
+  // Fecha (Esc/X) ou fechamento programático pelo pai após sucesso — em
+  // ambos os casos o form deve voltar limpo na próxima abertura.
+  React.useEffect(() => {
+    if (!open) form.reset();
+  }, [open, form]);
 
   function onSubmit(values: RegisterActivityValues) {
     onRegister(values);
-    toast.success("Atividade registrada.");
-    form.reset();
-    onOpenChange(false);
   }
 
   const selectedType = form.watch("type");
 
   return (
-    <Sheet open={open} onOpenChange={handleOpenChange}>
+    <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent>
         <SheetHeader>
           <SheetTitle>Registrar atividade</SheetTitle>
@@ -106,7 +105,9 @@ export function RegisterActivitySheet({
           </FieldGroup>
 
           <SheetFooter className="mt-auto px-0">
-            <Button type="submit">Registrar</Button>
+            <Button type="submit" disabled={isPending}>
+              {isPending ? "Registrando..." : "Registrar"}
+            </Button>
           </SheetFooter>
         </form>
       </SheetContent>
