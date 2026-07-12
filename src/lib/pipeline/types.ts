@@ -14,6 +14,7 @@ export type Deal = {
   value: number;
   leadId: string;
   leadName: string;
+  ownerId: string | null;
   ownerName: string;
   dueDate: string | null; // ISO yyyy-mm-dd
   stage: DealStage;

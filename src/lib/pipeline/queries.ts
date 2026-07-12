@@ -25,6 +25,7 @@ async function toDeal(row: DealRow, ownerNames: Map<string, string>): Promise<De
     value: row.value,
     leadId: row.lead_id,
     leadName: row.leads?.name ?? "—",
+    ownerId: row.owner_id,
     ownerName: (row.owner_id && ownerNames.get(row.owner_id)) || "—",
     dueDate: row.due_date,
     stage: row.stage as DealStage,

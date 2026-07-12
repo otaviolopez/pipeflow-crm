@@ -327,10 +327,10 @@ e 12 do PRD.
 reais do workspace ativo.
 
 **Entregas:**
-- [ ] Queries agregadas: total de leads, negócios abertos, valor total do
+- [x] Queries agregadas: total de leads, negócios abertos, valor total do
       pipeline, taxa de conversão
-- [ ] Dados reais do funil de vendas por etapa
-- [ ] Lista real de "negócios com prazo próximo" filtrada pelo usuário
+- [x] Dados reais do funil de vendas por etapa
+- [x] Lista real de "negócios com prazo próximo" filtrada pelo usuário
       logado
 
 **Commit final:** `feat(backend): dashboard com métricas reais do workspace`

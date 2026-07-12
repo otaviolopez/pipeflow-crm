@@ -34,9 +34,11 @@ const LOADING_DELAY_MS = 600;
 export function PipelineBoard({
   initialDeals,
   leadOptions,
+  currentUserId,
 }: {
   initialDeals: Deal[];
   leadOptions: { id: string; name: string }[];
+  currentUserId: string;
 }) {
   const [isLoading, setIsLoading] = React.useState(true);
   const [deals, setDeals] = React.useState<Deal[]>(initialDeals);
@@ -191,6 +193,7 @@ export function PipelineBoard({
       id: result.dealId!,
       stage: "new_lead",
       title: input.title,
+      ownerId: currentUserId,
       value: input.value,
       leadId: input.leadId,
       leadName,
