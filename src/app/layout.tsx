@@ -1,11 +1,20 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist_Mono, Inter, Space_Grotesk } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+// Fontes do design system "Elevate": Space Grotesk nos títulos (font-heading,
+// já usado em CardTitle/DialogTitle/SheetTitle/AlertDialogTitle), Inter no
+// corpo. Geist Mono mantido pra código/valores tabulares (não fazia parte do
+// Elevate, mas não havia motivo pra trocar só por trocar).
+const inter = Inter({
+  variable: "--font-inter",
+  subsets: ["latin"],
+});
+
+const spaceGrotesk = Space_Grotesk({
+  variable: "--font-space-grotesk",
   subsets: ["latin"],
 });
 
@@ -36,7 +45,7 @@ export default function RootLayout({
       // ainda não revelados ficam deslocados ±64px pra fora da tela
       // esperando a hora de entrar; sem cortar isso, contam como largura
       // rolável da página.
-      className={`${geistSans.variable} ${geistMono.variable} h-full overflow-x-hidden antialiased`}
+      className={`${inter.variable} ${spaceGrotesk.variable} ${geistMono.variable} h-full overflow-x-hidden antialiased`}
       suppressHydrationWarning
     >
       <body className="flex min-h-full flex-col">

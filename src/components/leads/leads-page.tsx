@@ -98,7 +98,7 @@ export function LeadsPage({
       </div>
 
       {isAtFreeLimit && (
-        <div className="flex items-center gap-2 rounded-lg border border-yellow-600/30 bg-yellow-500/10 px-3 py-2 text-sm text-yellow-800 dark:text-yellow-400">
+        <div className="flex items-center gap-2 rounded-lg border border-warning/30 bg-warning/10 px-3 py-2 text-sm text-warning-foreground">
           <TriangleAlert className="size-4 shrink-0" />
           <span>
             Você atingiu o limite de 50 leads do plano Free.{" "}
