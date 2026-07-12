@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import Link from "next/link";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CalendarIcon } from "lucide-react";
 import { useForm } from "react-hook-form";
@@ -19,6 +20,13 @@ import {
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { formatDueDate } from "@/lib/pipeline/format";
 
 const newDealSchema = z.object({
@@ -26,8 +34,7 @@ const newDealSchema = z.object({
   // valueAsNumber (no register abaixo) já converte a string do input antes
   // da validação — evita o descompasso de tipos entre z.coerce e useForm.
   value: z.number("Informe um valor numérico válido.").positive("Informe um valor numérico válido."),
-  leadName: z.string().trim().min(1, "Informe o lead vinculado."),
-  ownerName: z.string().trim().min(1, "Informe o responsável."),
+  leadId: z.string().trim().min(1, "Selecione o lead vinculado."),
 });
 
 type NewDealValues = z.infer<typeof newDealSchema>;
@@ -36,16 +43,18 @@ export function NewDealDialog({
   open,
   onOpenChange,
   onCreate,
+  leadOptions,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onCreate: (input: NewDealValues & { dueDate: string | null }) => void;
+  leadOptions: { id: string; name: string }[];
 }) {
   const [dueDate, setDueDate] = React.useState<Date | undefined>();
 
   const form = useForm<NewDealValues>({
     resolver: zodResolver(newDealSchema),
-    defaultValues: { title: "", value: 0, leadName: "", ownerName: "Você" },
+    defaultValues: { title: "", value: 0, leadId: "" },
   });
 
   function onSubmit(values: NewDealValues) {
@@ -58,6 +67,8 @@ export function NewDealDialog({
     onOpenChange(false);
   }
 
+  const hasLeads = leadOptions.length > 0;
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
@@ -68,6 +79,15 @@ export function NewDealDialog({
           </DialogDescription>
         </DialogHeader>
 
+        {!hasLeads ? (
+          <div className="flex flex-col items-center gap-3 rounded-xl border border-dashed p-6 text-center">
+            <p className="text-sm text-muted-foreground">
+              Cadastre um lead antes de criar um negócio — todo negócio precisa estar
+              vinculado a um lead.
+            </p>
+            <Button render={<Link href="/leads/new" />}>Cadastrar lead</Button>
+          </div>
+        ) : (
         <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4">
           <FieldGroup>
             <Field data-invalid={!!form.formState.errors.title}>
@@ -88,20 +108,27 @@ export function NewDealDialog({
               <FieldError errors={[form.formState.errors.value]} />
             </Field>
 
-            <Field data-invalid={!!form.formState.errors.leadName}>
+            <Field data-invalid={!!form.formState.errors.leadId}>
               <FieldLabel htmlFor="deal-lead">Lead vinculado</FieldLabel>
-              <Input
-                id="deal-lead"
-                placeholder="Nome do lead ou empresa"
-                {...form.register("leadName")}
-              />
-              <FieldError errors={[form.formState.errors.leadName]} />
-            </Field>
-
-            <Field data-invalid={!!form.formState.errors.ownerName}>
-              <FieldLabel htmlFor="deal-owner">Responsável</FieldLabel>
-              <Input id="deal-owner" {...form.register("ownerName")} />
-              <FieldError errors={[form.formState.errors.ownerName]} />
+              <Select
+                value={form.watch("leadId")}
+                onValueChange={(value) => form.setValue("leadId", value ?? "", { shouldValidate: true })}
+              >
+                <SelectTrigger id="deal-lead" aria-label="Lead vinculado">
+                  <SelectValue>
+                    {leadOptions.find((lead) => lead.id === form.watch("leadId"))?.name ??
+                      "Selecionar lead"}
+                  </SelectValue>
+                </SelectTrigger>
+                <SelectContent>
+                  {leadOptions.map((lead) => (
+                    <SelectItem key={lead.id} value={lead.id}>
+                      {lead.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <FieldError errors={[form.formState.errors.leadId]} />
             </Field>
 
             <Field>
@@ -133,6 +160,7 @@ export function NewDealDialog({
             <Button type="submit">Adicionar negócio</Button>
           </DialogFooter>
         </form>
+        )}
       </DialogContent>
     </Dialog>
   );

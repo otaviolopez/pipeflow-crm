@@ -10,8 +10,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { createActivity, updateLeadStatus } from "@/lib/leads/actions";
 import { formatCurrencyBRL } from "@/lib/pipeline/format";
-import { MOCK_DEALS } from "@/lib/pipeline/mock-data";
 import { STAGES } from "@/lib/pipeline/types";
+import type { Deal } from "@/lib/pipeline/types";
 import type { Activity, ActivityType, Lead } from "@/lib/leads/types";
 
 import { ActivityTimeline } from "./activity-timeline";
@@ -22,10 +22,12 @@ export function LeadDetailView({
   leadId,
   initialLead,
   initialActivities,
+  linkedDeals,
 }: {
   leadId: string;
   initialLead: Lead | null;
   initialActivities: Activity[];
+  linkedDeals: Deal[];
 }) {
   const [isPending, startTransition] = React.useTransition();
   const [isSheetOpen, setIsSheetOpen] = React.useState(false);
@@ -66,7 +68,6 @@ export function LeadDetailView({
   }
 
   const lead = initialLead;
-  const linkedDeals = MOCK_DEALS.filter((deal) => deal.leadName === lead.company);
   const subtitle = [lead.roleTitle, lead.company].filter(Boolean).join(" · ");
 
   return (

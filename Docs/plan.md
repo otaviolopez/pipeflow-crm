@@ -273,12 +273,12 @@ reais.
 otimista de verdade.
 
 **Entregas:**
-- [ ] Server Action criar negócio
-- [ ] Endpoint dedicado `PATCH /api/deals/:id/stage` para o drag-and-drop
+- [x] Server Action criar negócio
+- [x] Endpoint dedicado `PATCH /api/deals/:id/stage` para o drag-and-drop
       (Seção 12 do PRD)
-- [ ] Optimistic update com rollback real em caso de erro de rede (Seção
+- [x] Optimistic update com rollback real em caso de erro de rede (Seção
       6.2)
-- [ ] Confirmação obrigatória (com motivo opcional) ao mover para "Fechado
+- [x] Confirmação obrigatória (com motivo opcional) ao mover para "Fechado
       Perdido", gravando `lost_reason`
 
 **Commit final:** `feat(backend): pipeline conectado ao Supabase com stage otimista`

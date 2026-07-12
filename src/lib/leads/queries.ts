@@ -47,6 +47,22 @@ export async function getLeadsForWorkspace(workspaceId: string): Promise<Lead[]>
   }));
 }
 
+// Lista enxuta (sem os outros campos de Lead) para popular o seletor de
+// lead vinculado no diálogo de novo negócio (M11).
+export async function getLeadOptionsForWorkspace(
+  workspaceId: string
+): Promise<{ id: string; name: string }[]> {
+  const supabase = await createClient();
+
+  const { data } = await supabase
+    .from("leads")
+    .select("id, name")
+    .eq("workspace_id", workspaceId)
+    .order("name", { ascending: true });
+
+  return data ?? [];
+}
+
 export async function getLeadById(workspaceId: string, leadId: string): Promise<Lead | null> {
   const supabase = await createClient();
 

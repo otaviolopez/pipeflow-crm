@@ -12,6 +12,7 @@ export type Deal = {
   id: string;
   title: string;
   value: number;
+  leadId: string;
   leadName: string;
   ownerName: string;
   dueDate: string | null; // ISO yyyy-mm-dd

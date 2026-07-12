@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 
 import { LeadDetailView } from "@/components/leads/lead-detail-view";
 import { getActivitiesForLead, getLeadById } from "@/lib/leads/queries";
+import { getDealsForLead } from "@/lib/pipeline/queries";
 import { getActiveWorkspace, getUserWorkspaces } from "@/lib/workspace/session";
 
 export const metadata: Metadata = { title: "Detalhe do lead — PiperFlow" };
@@ -17,10 +18,19 @@ export default async function Page({
   const workspace = await getActiveWorkspace(await getUserWorkspaces());
   if (!workspace) redirect("/onboarding");
 
-  const [lead, activities] = await Promise.all([
+  const [lead, activities, deals] = await Promise.all([
     getLeadById(workspace.id, id),
     getActivitiesForLead(workspace.id, id),
+    getDealsForLead(workspace.id, id),
   ]);
 
-  return <LeadDetailView key={id} leadId={id} initialLead={lead} initialActivities={activities} />;
+  return (
+    <LeadDetailView
+      key={id}
+      leadId={id}
+      initialLead={lead}
+      initialActivities={activities}
+      linkedDeals={deals}
+    />
+  );
 }
