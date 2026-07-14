@@ -10,7 +10,18 @@ import {
 import { cn } from "@/lib/utils";
 import type { LeadStatus } from "@/lib/leads/types";
 
-const LABELS: Record<LeadStatus, string> = { active: "Ativo", inactive: "Inativo" };
+import { LEAD_STATUS_LABELS } from "./lead-status-badge";
+
+// !important: o SelectTrigger já traz `dark:bg-input/30` embutido, que teria
+// prioridade sobre as classes de cor abaixo no modo escuro e deixaria o texto
+// do badge ilegível — mesma progressão de cor do LeadStatusBadge.
+const STATUS_CLASSNAME: Record<LeadStatus, string> = {
+  new: "bg-secondary! text-secondary-foreground!",
+  contacted: "bg-secondary! text-secondary-foreground!",
+  waiting: "bg-warning/10! text-warning-foreground!",
+  qualified: "bg-primary! text-primary-foreground!",
+  disqualified: "bg-destructive/10! text-destructive!",
+};
 
 // Badge de status editável inline na página de detalhe do lead (PRD, Seção 9.3).
 export function LeadStatusEditableBadge({
@@ -27,19 +38,17 @@ export function LeadStatusEditableBadge({
         aria-label="Status do lead"
         className={cn(
           "h-6 rounded-full border-transparent px-2.5 text-xs font-medium",
-          // !important: o SelectTrigger já traz `dark:bg-input/30` embutido,
-          // que teria prioridade sobre bg-primary/bg-secondary no modo
-          // escuro e deixaria o texto do badge ilegível.
-          status === "active"
-            ? "bg-primary! text-primary-foreground!"
-            : "bg-secondary! text-secondary-foreground!"
+          STATUS_CLASSNAME[status]
         )}
       >
-        <SelectValue>{LABELS[status]}</SelectValue>
+        <SelectValue>{LEAD_STATUS_LABELS[status]}</SelectValue>
       </SelectTrigger>
       <SelectContent align="start">
-        <SelectItem value="active">Ativo</SelectItem>
-        <SelectItem value="inactive">Inativo</SelectItem>
+        {Object.entries(LEAD_STATUS_LABELS).map(([value, label]) => (
+          <SelectItem key={value} value={value}>
+            {label}
+          </SelectItem>
+        ))}
       </SelectContent>
     </Select>
   );

@@ -13,12 +13,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { LEAD_STATUS_LABELS } from "@/components/leads/lead-status-badge";
 import type { LeadStatus } from "@/lib/leads/types";
 
 const STATUS_LABELS: Record<"all" | LeadStatus, string> = {
   all: "Todos os status",
-  active: "Ativo",
-  inactive: "Inativo",
+  ...LEAD_STATUS_LABELS,
 };
 
 export function LeadsToolbar({
@@ -70,8 +70,11 @@ export function LeadsToolbar({
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="all">Todos os status</SelectItem>
-          <SelectItem value="active">Ativo</SelectItem>
-          <SelectItem value="inactive">Inativo</SelectItem>
+          {Object.entries(LEAD_STATUS_LABELS).map(([value, label]) => (
+            <SelectItem key={value} value={value}>
+              {label}
+            </SelectItem>
+          ))}
         </SelectContent>
       </Select>
 

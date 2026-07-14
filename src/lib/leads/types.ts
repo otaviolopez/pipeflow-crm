@@ -1,6 +1,8 @@
 // Valores em inglês, iguais ao schema do banco (CLAUDE.md) — a tradução
-// para português é só de apresentação.
-export type LeadStatus = "active" | "inactive";
+// para português é só de apresentação. Independente de deals.stage (PRD,
+// Seção 6.1): nenhum valor aqui significa "virou cliente" — isso é sempre
+// deals.stage === 'won'.
+export type LeadStatus = "new" | "contacted" | "waiting" | "qualified" | "disqualified";
 
 export type Lead = {
   id: string;

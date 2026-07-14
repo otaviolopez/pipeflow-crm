@@ -153,7 +153,13 @@ receita).
 ## 6. Funcionalidades Principais (MVP)
 
 ### 6.1 Gestão de Leads e Contatos
-- Cadastro: nome, e-mail, telefone, empresa, cargo, status (Ativo / Inativo)
+- Cadastro: nome, e-mail, telefone, empresa, cargo, status do lead (Novo /
+  Contatado / Em espera / Qualificado / Desqualificado)
+- Status do lead é independente da etapa do negócio no pipeline
+  (`deals.stage`, Seção 6.2): um lead pode estar "Qualificado" com um negócio
+  parado em "Proposta Enviada", por exemplo. Nenhum valor de status do lead
+  corresponde a "virou cliente" — isso é sempre representado por
+  `deals.stage = 'won'`.
 - Listagem com busca full-text (nome, e-mail, empresa) e filtros por status,
   responsável e data de cadastro
 - Página de detalhe do lead (`/leads/[id]`) com perfil completo + timeline
@@ -385,7 +391,9 @@ AUTENTICADAS
 │
 ├─ COM DADOS
 │  Busca full-text (nome/e-mail/empresa) + filtros: status | responsável | data
-│  Tabela: nome | empresa | status (badge) | responsável | última atividade
+│  Tabela: nome | empresa | status (badge, 5 variantes — Novo / Contatado /
+│    Em espera / Qualificado / Desqualificado) | responsável | última
+│    atividade | criado em
 │  Paginação: 20 itens/página
 │
 ├─ BUSCA SEM RESULTADO
@@ -645,7 +653,9 @@ leads (
   phone text,
   company text,
   role_title text,
-  status text not null default 'active' check (status in ('active', 'inactive')),
+  status text not null default 'new' check (
+    status in ('new', 'contacted', 'waiting', 'qualified', 'disqualified')
+  ),
   owner_id uuid references auth.users(id),
   created_at timestamptz not null default now()
 )

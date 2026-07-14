@@ -78,10 +78,46 @@ create table if not exists public.leads (
   phone text,
   company text,
   role_title text,
-  status text not null default 'active' check (status in ('active', 'inactive')),
+  status text not null default 'new' check (
+    status in ('new', 'contacted', 'waiting', 'qualified', 'disqualified')
+  ),
   owner_id uuid references auth.users (id),
   created_at timestamptz not null default now()
 );
+
+-- Migração do enum de status de leads (active/inactive -> novo enum de 5
+-- valores, ver PRD Seção 6.1). Remapeamento: 'active' vira 'new' (estado
+-- inicial mais próximo — não há como saber quanto progresso o lead já teve
+-- só pelo binário antigo); 'inactive' vira 'disqualified' (fim do funil, mais
+-- próximo do significado original de "não seguir com este contato"). Cobre
+-- bancos já existentes (leads criado no M8/M10); o "create table" acima já
+-- cobre instalações novas.
+do $$
+begin
+  if exists (
+    select 1 from pg_constraint
+    where conname = 'leads_status_check'
+      and pg_get_constraintdef(oid) like '%active%inactive%'
+  ) then
+    -- Constraint trocada ANTES dos updates: o Postgres valida o check em
+    -- cada statement (não só no fim da transação), então gravar 'new'/
+    -- 'disqualified' com a constraint antiga ainda ativa (só aceita
+    -- active/inactive) quebra o update com "violates check constraint".
+    alter table public.leads drop constraint leads_status_check;
+    alter table public.leads add constraint leads_status_check check (
+      status in ('active', 'inactive', 'new', 'contacted', 'waiting', 'qualified', 'disqualified')
+    );
+
+    update public.leads set status = 'new' where status = 'active';
+    update public.leads set status = 'disqualified' where status = 'inactive';
+
+    alter table public.leads alter column status set default 'new';
+    alter table public.leads drop constraint leads_status_check;
+    alter table public.leads add constraint leads_status_check check (
+      status in ('new', 'contacted', 'waiting', 'qualified', 'disqualified')
+    );
+  end if;
+end $$;
 
 create table if not exists public.deals (
   id uuid primary key default gen_random_uuid(),
