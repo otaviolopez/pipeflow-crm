@@ -4,7 +4,11 @@ import { redirect } from "next/navigation";
 import { TeamSettings } from "@/components/settings/team-settings";
 import { createClient } from "@/lib/supabase/server";
 import { getPendingInvites, getWorkspaceMembers } from "@/lib/settings/queries";
-import { getActiveWorkspace, getUserWorkspaces } from "@/lib/workspace/session";
+import {
+  getActiveWorkspace,
+  getCurrentUserRole,
+  getUserWorkspaces,
+} from "@/lib/workspace/session";
 
 export const metadata: Metadata = { title: "Equipe — PiperFlow" };
 
@@ -17,9 +21,10 @@ export default async function SettingsTeamPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const [members, invites] = await Promise.all([
+  const [members, invites, currentUserRole] = await Promise.all([
     getWorkspaceMembers(workspace.id),
     getPendingInvites(workspace.id),
+    getCurrentUserRole(workspace.id),
   ]);
 
   return (
@@ -27,6 +32,7 @@ export default async function SettingsTeamPage() {
       members={members}
       invites={invites}
       currentUserId={user?.id ?? ""}
+      currentUserRole={currentUserRole}
       isFreePlan={workspace.plan === "free"}
     />
   );

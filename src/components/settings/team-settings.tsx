@@ -18,6 +18,7 @@ import { formatRelativeDate } from "@/lib/leads/format";
 import { removeMember } from "@/lib/settings/actions";
 import { FREE_PLAN_MEMBER_LIMIT, ROLE_LABELS } from "@/lib/settings/types";
 import type { Invite, Member } from "@/lib/settings/types";
+import type { WorkspaceRole } from "@/lib/workspace/session";
 
 import { InviteMemberDialog } from "./invite-member-dialog";
 import { RemoveMemberDialog } from "./remove-member-dialog";
@@ -35,13 +36,16 @@ export function TeamSettings({
   members,
   invites,
   currentUserId,
+  currentUserRole,
   isFreePlan,
 }: {
   members: Member[];
   invites: Invite[];
   currentUserId: string;
+  currentUserRole: WorkspaceRole | null;
   isFreePlan: boolean;
 }) {
+  const isAdmin = currentUserRole === "admin";
   const [isPending, startTransition] = React.useTransition();
   const [isInviteOpen, setIsInviteOpen] = React.useState(false);
   const [memberToRemove, setMemberToRemove] = React.useState<Member | null>(null);
@@ -74,10 +78,12 @@ export function TeamSettings({
             {members.length}/{FREE_PLAN_MEMBER_LIMIT} colaboradores no plano Free.
           </p>
         </div>
-        <Button onClick={() => setIsInviteOpen(true)}>
-          <UserPlus />
-          Convidar membro
-        </Button>
+        {isAdmin && (
+          <Button onClick={() => setIsInviteOpen(true)}>
+            <UserPlus />
+            Convidar membro
+          </Button>
+        )}
       </div>
 
       <Card>
@@ -105,7 +111,7 @@ export function TeamSettings({
                 </div>
                 <div className="flex items-center gap-2">
                   <Badge variant="secondary">{ROLE_LABELS[member.role]}</Badge>
-                  {!isCurrentUser && (
+                  {!isCurrentUser && isAdmin && (
                     <DropdownMenu>
                       <DropdownMenuTrigger
                         render={

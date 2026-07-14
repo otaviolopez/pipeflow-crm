@@ -2,13 +2,19 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
 import { WorkspaceSettingsForm } from "@/components/settings/workspace-settings-form";
-import { getActiveWorkspace, getUserWorkspaces } from "@/lib/workspace/session";
+import {
+  getActiveWorkspace,
+  getCurrentUserRole,
+  getUserWorkspaces,
+} from "@/lib/workspace/session";
 
 export const metadata: Metadata = { title: "Workspace — PiperFlow" };
 
 export default async function SettingsWorkspacePage() {
   const workspace = await getActiveWorkspace(await getUserWorkspaces());
   if (!workspace) redirect("/onboarding");
+
+  const currentUserRole = await getCurrentUserRole(workspace.id);
 
   return (
     <div className="flex flex-col gap-4">
@@ -21,7 +27,7 @@ export default async function SettingsWorkspacePage() {
           Nome e dados gerais do workspace atual.
         </p>
       </div>
-      <WorkspaceSettingsForm name={workspace.name} />
+      <WorkspaceSettingsForm name={workspace.name} currentUserRole={currentUserRole} />
     </div>
   );
 }

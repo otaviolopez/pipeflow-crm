@@ -8,9 +8,16 @@ import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
+import {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+} from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { updateWorkspaceName } from "@/lib/workspace/actions";
+import type { WorkspaceRole } from "@/lib/workspace/session";
 
 const workspaceSchema = z.object({
   name: z.string().trim().min(2, "O nome do workspace é obrigatório."),
@@ -18,7 +25,14 @@ const workspaceSchema = z.object({
 
 type WorkspaceValues = z.infer<typeof workspaceSchema>;
 
-export function WorkspaceSettingsForm({ name }: { name: string }) {
+export function WorkspaceSettingsForm({
+  name,
+  currentUserRole,
+}: {
+  name: string;
+  currentUserRole: WorkspaceRole | null;
+}) {
+  const isAdmin = currentUserRole === "admin";
   const form = useForm<WorkspaceValues>({
     resolver: zodResolver(workspaceSchema),
     defaultValues: { name },
@@ -41,15 +55,20 @@ export function WorkspaceSettingsForm({ name }: { name: string }) {
           <FieldGroup>
             <Field data-invalid={!!form.formState.errors.name}>
               <FieldLabel htmlFor="workspace-name">Nome do workspace</FieldLabel>
-              <Input id="workspace-name" {...form.register("name")} />
+              <Input id="workspace-name" disabled={!isAdmin} {...form.register("name")} />
               <FieldError errors={[form.formState.errors.name]} />
+              {!isAdmin && (
+                <FieldDescription>
+                  Somente administradores podem renomear o workspace.
+                </FieldDescription>
+              )}
             </Field>
           </FieldGroup>
         </CardContent>
         <CardFooter className="justify-end">
           <Button
             type="submit"
-            disabled={!form.formState.isDirty || form.formState.isSubmitting}
+            disabled={!isAdmin || !form.formState.isDirty || form.formState.isSubmitting}
           >
             Salvar alterações
           </Button>
