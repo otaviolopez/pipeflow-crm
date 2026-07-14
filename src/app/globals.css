@@ -154,3 +154,34 @@
     @apply font-sans;
   }
 }
+
+/* Shimmer dos skeletons: brilho diagonal que percorre o elemento, no lugar
+   do pulse padrão do shadcn. O brilho usa color-mix sobre --foreground
+   (mesmo idioma do funil do dashboard) pra se adaptar aos dois temas sem
+   rampa própria: escurece de leve no claro, clareia no escuro. */
+@keyframes skeleton-shimmer {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}
+
+@utility skeleton-shimmer {
+  background-image: linear-gradient(
+    105deg,
+    transparent 40%,
+    color-mix(in oklch, var(--foreground) 10%, transparent) 50%,
+    transparent 60%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.5s ease-in-out infinite;
+
+  /* Com preferência por menos movimento, o skeleton fica estático
+     (só o bg-muted base), sem o gradiente varrendo. */
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+    background-image: none;
+  }
+}
