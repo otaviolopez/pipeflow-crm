@@ -139,6 +139,35 @@ export async function createInvite(input: { email: string; role: MemberRole }) {
   return {};
 }
 
+export async function updateProfileName(name: string) {
+  const trimmed = name.trim();
+  if (!trimmed) {
+    return { error: "O nome é obrigatório." };
+  }
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) {
+    return { error: "Sessão expirada. Faça login novamente." };
+  }
+
+  // RLS ("profiles: update self") já restringe a linha do próprio usuário —
+  // o .eq("id", user.id) aqui é só para deixar a intenção explícita na query.
+  const { error } = await supabase
+    .from("profiles")
+    .update({ name: trimmed })
+    .eq("id", user.id);
+
+  if (error) {
+    return { error: "Não foi possível atualizar o perfil. Tente novamente." };
+  }
+
+  revalidatePath("/", "layout");
+  return {};
+}
+
 export async function removeMember(memberId: string) {
   const supabase = await createClient();
   const workspace = await getActiveWorkspace(await getUserWorkspaces());

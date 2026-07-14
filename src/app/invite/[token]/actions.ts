@@ -31,9 +31,15 @@ export async function loginAndAcceptInvite(token: string, formData: FormData) {
 }
 
 export async function signupAndAcceptInvite(token: string, formData: FormData) {
-  const supabase = await createClient();
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
+  const confirmPassword = formData.get("confirmPassword") as string;
+
+  if (password !== confirmPassword) {
+    return { error: "As senhas não coincidem." };
+  }
+
+  const supabase = await createClient();
 
   const { data, error: signUpError } = await supabase.auth.signUp({
     email,

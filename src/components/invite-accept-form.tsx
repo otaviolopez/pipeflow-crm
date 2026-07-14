@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { loginAndAcceptInvite, signupAndAcceptInvite } from "@/app/invite/[token]/actions";
 
@@ -82,10 +83,19 @@ export function InviteAcceptForm({
               </Field>
               <Field>
                 <FieldLabel htmlFor="create-password">Senha</FieldLabel>
-                <Input
+                <PasswordInput
                   id="create-password"
                   name="password"
-                  type="password"
+                  autoComplete="new-password"
+                  minLength={6}
+                  required
+                />
+              </Field>
+              <Field>
+                <FieldLabel htmlFor="create-confirm-password">Confirmar senha</FieldLabel>
+                <PasswordInput
+                  id="create-confirm-password"
+                  name="confirmPassword"
                   autoComplete="new-password"
                   minLength={6}
                   required
@@ -113,10 +123,9 @@ export function InviteAcceptForm({
               </Field>
               <Field>
                 <FieldLabel htmlFor="login-password">Senha</FieldLabel>
-                <Input
+                <PasswordInput
                   id="login-password"
                   name="password"
-                  type="password"
                   autoComplete="current-password"
                   required
                 />

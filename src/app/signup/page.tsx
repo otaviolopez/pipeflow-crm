@@ -5,6 +5,7 @@ import { AuthShell } from "@/components/auth-shell";
 import { Button } from "@/components/ui/button";
 import { Field, FieldDescription, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 
 import { signup } from "./actions";
 
@@ -20,7 +21,7 @@ export default async function SignupPage({
   return (
     <AuthShell
       title="Criar conta"
-      description="Comece a organizar suas vendas em poucos minutos."
+      description="Comece grátis, sem cartão de crédito."
       footer={
         <p className="text-sm text-muted-foreground">
           Já tem uma conta?{" "}
@@ -45,6 +46,16 @@ export default async function SignupPage({
 
         <FieldGroup>
           <Field>
+            <FieldLabel htmlFor="name">Nome completo</FieldLabel>
+            <Input
+              id="name"
+              name="name"
+              type="text"
+              autoComplete="name"
+              required
+            />
+          </Field>
+          <Field>
             <FieldLabel htmlFor="email">E-mail</FieldLabel>
             <Input
               id="email"
@@ -56,18 +67,27 @@ export default async function SignupPage({
           </Field>
           <Field>
             <FieldLabel htmlFor="password">Senha</FieldLabel>
-            <Input
+            <PasswordInput
               id="password"
               name="password"
-              type="password"
               autoComplete="new-password"
               minLength={6}
               required
             />
             <FieldDescription>Mínimo de 6 caracteres.</FieldDescription>
           </Field>
+          <Field>
+            <FieldLabel htmlFor="confirmPassword">Confirmar senha</FieldLabel>
+            <PasswordInput
+              id="confirmPassword"
+              name="confirmPassword"
+              autoComplete="new-password"
+              minLength={6}
+              required
+            />
+          </Field>
           <Button type="submit" formAction={signup} className="mt-1 w-full">
-            Criar conta
+            Criar conta grátis
           </Button>
         </FieldGroup>
       </form>

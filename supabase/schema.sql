@@ -152,6 +152,16 @@ create table if not exists public.activities (
 -- workspace_id (e demais FKs usadas em JOINs ou políticas de RLS) precisa de
 -- índice explícito.
 
+-- Não é FK (aponta para o Stripe, não para outra tabela do banco), mas é
+-- usada em WHERE no webhook (src/app/api/stripe/webhook/route.ts) como
+-- fallback quando o evento não traz metadata.workspace_id — sem índice,
+-- vira sequential scan na tabela inteira a cada evento do Stripe. Parcial
+-- (where ... is not null) porque todo workspace no Free tem essa coluna
+-- nula — só workspaces Pro (minoria) entram no índice.
+create index if not exists workspaces_stripe_subscription_id_idx
+  on public.workspaces (stripe_subscription_id)
+  where stripe_subscription_id is not null;
+
 create index if not exists workspace_members_workspace_id_idx on public.workspace_members (workspace_id);
 create index if not exists workspace_members_user_id_idx on public.workspace_members (user_id);
 
@@ -235,8 +245,18 @@ security definer
 set search_path = ''
 as $$
 begin
+  -- raw_user_meta_data.name vem de options.data no supabase.auth.signUp()
+  -- (src/app/signup/actions.ts) — nome digitado no cadastro. Fallback pra
+  -- parte do e-mail antes do @ cobre fluxos que não passam nome (ex.:
+  -- accept_invite, que só cria o profile via signUp de convite) — nullif
+  -- trata string vazia como ausente também, já que coalesce sozinho só
+  -- ativa o fallback para NULL, não para "".
   insert into public.profiles (id, name, email)
-  values (new.id, split_part(new.email, '@', 1), new.email);
+  values (
+    new.id,
+    coalesce(nullif(new.raw_user_meta_data->>'name', ''), split_part(new.email, '@', 1)),
+    new.email
+  );
   return new;
 end;
 $$;
@@ -449,3 +469,11 @@ create policy "profiles: select as workspace-mate" on public.profiles
         and theirs.user_id = public.profiles.id
     )
   );
+
+-- Cada usuário só edita o próprio nome de exibição — nunca o de outro membro
+-- (mesmo sendo admin do workspace: perfil não é dado de negócio do workspace).
+drop policy if exists "profiles: update self" on public.profiles;
+create policy "profiles: update self" on public.profiles
+  for update to authenticated
+  using ( id = (select auth.uid()) )
+  with check ( id = (select auth.uid()) );

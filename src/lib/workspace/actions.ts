@@ -4,7 +4,11 @@ import { randomUUID } from "node:crypto";
 import { revalidatePath } from "next/cache";
 
 import { createClient } from "@/lib/supabase/server";
-import { setActiveWorkspaceCookie } from "@/lib/workspace/session";
+import {
+  getActiveWorkspace,
+  getUserWorkspaces,
+  setActiveWorkspaceCookie,
+} from "@/lib/workspace/session";
 
 export async function createWorkspace(name: string) {
   const trimmed = name.trim();
@@ -33,6 +37,36 @@ export async function createWorkspace(name: string) {
   revalidatePath("/", "layout");
 
   return { workspaceId };
+}
+
+export async function updateWorkspaceName(name: string) {
+  const trimmed = name.trim();
+  if (trimmed.length < 2) {
+    return { error: "O nome do workspace é obrigatório." };
+  }
+
+  const supabase = await createClient();
+  const workspace = await getActiveWorkspace(await getUserWorkspaces());
+  if (!workspace) {
+    return { error: "Nenhum workspace ativo." };
+  }
+
+  // RLS ("workspaces: update as admin") já barra quem não é admin — o filtro
+  // aqui só transforma esse caso num erro amigável em vez de um update que
+  // retorna 0 linhas afetadas sem aviso nenhum pro usuário.
+  const { data, error } = await supabase
+    .from("workspaces")
+    .update({ name: trimmed })
+    .eq("id", workspace.id)
+    .select("id")
+    .maybeSingle();
+
+  if (error || !data) {
+    return { error: "Só administradores podem renomear o workspace." };
+  }
+
+  revalidatePath("/", "layout");
+  return {};
 }
 
 export async function switchWorkspace(workspaceId: string) {

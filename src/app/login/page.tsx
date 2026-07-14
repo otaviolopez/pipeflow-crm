@@ -5,6 +5,7 @@ import { AuthShell } from "@/components/auth-shell";
 import { Button } from "@/components/ui/button";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 
 import { login } from "./actions";
 
@@ -67,10 +68,9 @@ export default async function LoginPage({
           </Field>
           <Field>
             <FieldLabel htmlFor="password">Senha</FieldLabel>
-            <Input
+            <PasswordInput
               id="password"
               name="password"
-              type="password"
               autoComplete="current-password"
               minLength={6}
               required
