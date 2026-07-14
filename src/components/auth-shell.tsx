@@ -31,13 +31,13 @@ export function AuthShell({
             usar o botão "voltar" do navegador para sair da tela de auth. */}
         <Link
           href="/"
-          className="inline-flex w-fit items-center gap-1.5 rounded-md text-sm text-muted-foreground outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring"
+          className="inline-flex w-fit items-center gap-1.5 rounded-md text-sm text-muted-foreground visited:text-muted-foreground outline-none hover:text-primary focus-visible:ring-2 focus-visible:ring-ring"
         >
           <ArrowLeft className="size-4" aria-hidden="true" />
           Voltar para o início
         </Link>
 
-        <span className="text-center text-xl font-semibold tracking-tight">
+        <span className="text-center font-heading text-xl font-semibold tracking-tight">
           PiperFlow CRM
         </span>
 

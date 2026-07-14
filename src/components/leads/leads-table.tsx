@@ -35,7 +35,7 @@ export function LeadsTable({
 }) {
   if (isLoading) {
     return (
-      <div className="rounded-xl border">
+      <div className="rounded-xl border border-primary/20">
         <Table>
           <TableHeader>
             <TableRow>
@@ -96,7 +96,7 @@ export function LeadsTable({
   }
 
   return (
-    <div className="rounded-xl border">
+    <div className="rounded-xl border border-primary/20">
       <Table>
         <TableHeader>
           <TableRow>

@@ -27,7 +27,7 @@ export default async function SignupPage({
           Já tem uma conta?{" "}
           <Link
             href="/login"
-            className="font-medium text-foreground underline underline-offset-4"
+            className="font-medium text-primary visited:text-primary underline underline-offset-4 hover:text-primary/80"
           >
             Entrar
           </Link>

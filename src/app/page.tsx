@@ -103,15 +103,25 @@ function LandingNav() {
           PiperFlow
         </Link>
         <nav className="hidden items-center gap-8 text-sm text-muted-foreground sm:flex">
-          <a href="#funcionalidades" className="transition-colors hover:text-foreground">
+          <a
+            href="#funcionalidades"
+            className="visited:text-muted-foreground transition-colors hover:text-primary"
+          >
             Funcionalidades
           </a>
-          <a href="#precos" className="transition-colors hover:text-foreground">
+          <a
+            href="#precos"
+            className="visited:text-muted-foreground transition-colors hover:text-primary"
+          >
             Preços
           </a>
         </nav>
         <div className="flex items-center gap-2">
-          <Button variant="ghost" render={<Link href="/login" />}>
+          <Button
+            variant="ghost"
+            className="hover:bg-accent hover:text-accent-foreground"
+            render={<Link href="/login" />}
+          >
             Entrar
           </Button>
           <Button render={<Link href="/signup" />}>Criar conta</Button>
@@ -140,7 +150,7 @@ function Hero() {
       <div className="relative mx-auto grid w-full max-w-6xl gap-16 px-6 py-24 [zoom:1.2] lg:grid-cols-[1.1fr_0.9fr] lg:items-center lg:py-32">
         <div className="flex flex-col gap-6">
           <span
-            className="w-fit animate-in fade-in-0 slide-in-from-bottom-2 rounded-full border border-border px-3 py-1 text-xs font-medium text-muted-foreground fill-mode-both duration-700"
+            className="w-fit animate-in fade-in-0 slide-in-from-bottom-2 rounded-full border border-accent bg-accent px-3 py-1 text-xs font-medium text-accent-foreground fill-mode-both duration-700"
             style={{ animationDelay: "0ms" }}
           >
             CRM para pequenos negócios e freelancers
@@ -150,7 +160,7 @@ function Hero() {
             className="animate-in fade-in-0 slide-in-from-bottom-3 text-balance font-heading text-4xl leading-[1.05] font-semibold tracking-tight fill-mode-both duration-700 sm:text-5xl lg:text-6xl"
             style={{ animationDelay: "80ms" }}
           >
-            Sua próxima venda não devia morar numa planilha.
+            Sua próxima venda não devia morar <span className="text-primary">numa planilha</span>.
           </h1>
 
           <p
@@ -170,7 +180,12 @@ function Hero() {
               Criar conta grátis
               <ArrowRight />
             </Button>
-            <Button size="lg" variant="outline" render={<a href="#precos" />}>
+            <Button
+              size="lg"
+              variant="outline"
+              className="border-primary/40 text-primary hover:bg-primary/10"
+              render={<a href="#precos" />}
+            >
               Ver planos
             </Button>
           </div>
@@ -193,7 +208,7 @@ function PipelinePreview() {
   const columns = [
     { label: "Novo Lead", cards: [70, 45] },
     { label: "Proposta Enviada", cards: [55, 80, 40] },
-    { label: "Fechado Ganho", cards: [60] },
+    { label: "Fechado Ganho", cards: [60], won: true },
   ];
 
   return (
@@ -207,13 +222,25 @@ function PipelinePreview() {
             {column.cards.map((width, index) => (
               <div
                 key={index}
-                className="rounded-lg border border-border/70 bg-muted/40 p-2"
+                className={cn(
+                  "rounded-lg border border-border/70 bg-muted/40 p-2",
+                  // Primeiro card de "Proposta Enviada" ganha o mesmo idioma
+                  // de acento lateral usado nos cards de seção do dashboard
+                  // real (border-l-primary) — reforça consistência entre o
+                  // mockup da landing e o produto de verdade.
+                  column.label === "Proposta Enviada" && index === 0 && "border-l-2 border-l-primary"
+                )}
               >
                 <div
-                  className="h-2 rounded-full bg-foreground/15"
+                  className={cn("h-2 rounded-full", column.won ? "bg-primary/60" : "bg-foreground/15")}
                   style={{ width: `${width}%` }}
                 />
-                <div className="mt-2 h-4 w-10 rounded-full bg-foreground/10" />
+                <div
+                  className={cn(
+                    "mt-2 h-4 w-10 rounded-full",
+                    column.won ? "bg-primary/40" : "bg-foreground/10"
+                  )}
+                />
               </div>
             ))}
           </div>
@@ -241,10 +268,10 @@ function Features() {
           // Card da esquerda entra vindo da esquerda, card da direita vindo
           // da direita — reforça a leitura em coluna do grid 2x2.
           <ScrollReveal key={feature.title} from={index % 2 === 0 ? "left" : "right"}>
-            <Card className="transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:ring-foreground/25">
+            <Card className="transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:ring-primary/30">
               <CardContent className="flex flex-col gap-3">
-                <div className="flex size-10 items-center justify-center rounded-lg bg-muted transition-colors duration-300 group-hover/card:bg-foreground group-hover/card:text-background">
-                  <feature.icon className="size-5 text-foreground transition-colors duration-300 group-hover/card:text-background" />
+                <div className="flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary transition-colors duration-300 group-hover/card:bg-primary group-hover/card:text-primary-foreground">
+                  <feature.icon className="size-5 transition-colors duration-300" />
                 </div>
                 <h3 className="font-heading text-lg font-medium">{feature.title}</h3>
                 <p className="text-sm text-muted-foreground">{feature.description}</p>
@@ -259,7 +286,7 @@ function Features() {
 
 function Pricing() {
   return (
-    <section id="precos" className="border-t border-border/60 bg-muted/20">
+    <section id="precos" className="border-t border-border/60 bg-accent/30">
       <div className="mx-auto w-full max-w-6xl px-6 py-24">
         <ScrollReveal from="bottom" className="mx-auto max-w-xl text-center">
           <h2 className="font-heading text-3xl font-semibold tracking-tight sm:text-4xl">
@@ -283,7 +310,7 @@ function Pricing() {
               className="relative"
             >
               {plan.highlighted && (
-                <span className="absolute -top-3 left-1/2 z-10 -translate-x-1/2 rounded-full bg-foreground px-3 py-1 text-xs font-medium text-background">
+                <span className="absolute -top-3 left-1/2 z-10 -translate-x-1/2 rounded-full bg-primary px-3 py-1 text-xs font-medium text-primary-foreground">
                   Mais popular
                 </span>
               )}
@@ -293,14 +320,19 @@ function Pricing() {
                   // O plano Pro já tem ring cheio permanente (destaque de
                   // "mais popular") — só o Free ganha o ring de hover, pra
                   // não enfraquecer o ring do Pro ao passar o mouse.
-                  plan.highlighted ? "ring-2 ring-foreground" : "hover:ring-foreground/25"
+                  plan.highlighted ? "ring-2 ring-primary" : "hover:ring-primary/25"
                 )}
               >
                 <CardContent className="flex flex-col gap-6">
                   <div className="flex flex-col gap-1">
                     <span className="font-heading text-lg font-medium">{plan.name}</span>
                     <div className="flex items-baseline gap-1.5">
-                      <span className="text-4xl font-semibold tracking-tight">
+                      <span
+                        className={cn(
+                          "text-4xl font-semibold tracking-tight",
+                          plan.highlighted && "text-primary"
+                        )}
+                      >
                         {plan.price}
                       </span>
                       <span className="text-sm text-muted-foreground">{plan.period}</span>
@@ -311,7 +343,12 @@ function Pricing() {
                   <ul className="flex flex-col gap-2.5">
                     {plan.features.map((feature) => (
                       <li key={feature} className="flex items-center gap-2 text-sm">
-                        <Check className="size-4 shrink-0 text-muted-foreground" />
+                        <Check
+                          className={cn(
+                            "size-4 shrink-0",
+                            plan.highlighted ? "text-primary" : "text-muted-foreground"
+                          )}
+                        />
                         {feature}
                       </li>
                     ))}
@@ -339,7 +376,7 @@ function FinalCta() {
     <section className="relative mx-auto w-full max-w-6xl px-6 py-24 text-center">
       <ScrollReveal from="bottom" className="mx-auto flex max-w-lg flex-col items-center">
         <h2 className="text-balance font-heading text-3xl font-semibold tracking-tight sm:text-4xl">
-          Organize suas vendas em menos de 5 minutos.
+          Organize suas vendas em menos de <span className="text-primary">5 minutos</span>.
         </h2>
         <p className="mt-3 max-w-md text-muted-foreground">
           Sem cartão de crédito. Sem trial disfarçado. É Free de verdade.
@@ -374,10 +411,16 @@ function LandingFooter() {
         <span className="font-heading font-semibold text-foreground">PiperFlow</span>
         <span>© {new Date().getFullYear()} PiperFlow CRM.</span>
         <div className="flex items-center gap-4">
-          <Link href="/login" className="transition-colors hover:text-foreground">
+          <Link
+            href="/login"
+            className="visited:text-muted-foreground transition-colors hover:text-primary"
+          >
             Entrar
           </Link>
-          <Link href="/signup" className="transition-colors hover:text-foreground">
+          <Link
+            href="/signup"
+            className="visited:text-muted-foreground transition-colors hover:text-primary"
+          >
             Criar conta
           </Link>
         </div>
