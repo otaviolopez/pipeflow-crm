@@ -45,7 +45,14 @@ export default async function DashboardPage() {
 
   return (
     <div className="flex flex-1 flex-col gap-6 p-6">
-      <h1 className="text-2xl font-semibold tracking-tight">Dashboard</h1>
+      {/* Barra de acento antes do título — mesmo idioma da borda lateral dos
+          cards de seção logo abaixo, aplicada uma única vez por página
+          (não em cada subtítulo de card) pra marcar hierarquia sem repetir
+          a cor em excesso. */}
+      <h1 className="flex items-center gap-2.5 text-2xl font-semibold tracking-tight">
+        <span className="h-6 w-1 rounded-full bg-primary" aria-hidden />
+        Dashboard
+      </h1>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <KpiCard label="Total de leads" value={String(metrics.totalLeads)} />
@@ -61,7 +68,11 @@ export default async function DashboardPage() {
       </div>
 
       <div className="grid flex-1 grid-cols-1 gap-4 lg:grid-cols-[1.4fr_1fr]">
-        <Card>
+        {/* Acento na borda esquerda: marca os dois cards de seção do
+            dashboard (agrupamentos de nível superior), distinto do acento
+            no topo dos KPIs — nunca os dois na mesma tela apontando pra
+            hierarquias diferentes com a mesma borda. */}
+        <Card className="border-l-2 border-l-primary">
           <CardHeader>
             <CardTitle>Funil de vendas por etapa</CardTitle>
           </CardHeader>
@@ -70,7 +81,7 @@ export default async function DashboardPage() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="border-l-2 border-l-primary">
           <CardHeader>
             <CardTitle>Meus negócios com prazo próximo</CardTitle>
             <CardDescription>{currentUserName} · próximos 7 dias</CardDescription>

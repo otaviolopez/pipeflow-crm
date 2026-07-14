@@ -26,6 +26,7 @@
   --color-chart-3: var(--chart-3);
   --color-chart-2: var(--chart-2);
   --color-chart-1: var(--chart-1);
+  --color-chart-funnel: var(--chart-funnel);
   --color-ring: var(--ring);
   --color-input: var(--input);
   --color-border: var(--border);
@@ -93,6 +94,12 @@
   --chart-3: oklch(0.439 0 0);
   --chart-4: oklch(0.371 0 0);
   --chart-5: oklch(0.269 0 0);
+  /* Base da rampa do funil (dado ordinal: um matiz só, escuro→claro via
+     opacidade). No claro, o roxo mais escuro do UI Kit Elevate (violet-950);
+     no escuro, uma base clara (violet-300) pra rampa apagar em direção ao
+     fundo. Degraus validados com o validador da skill dataviz: ΔL adjacente
+     ≥ 0.06 e extremo claro ≥ 2:1 de contraste vs card, nos dois temas. */
+  --chart-funnel: oklch(0.283 0.141 291.089);
   --radius: 8px;
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
@@ -133,6 +140,7 @@
   --chart-3: oklch(0.439 0 0);
   --chart-4: oklch(0.371 0 0);
   --chart-5: oklch(0.269 0 0);
+  --chart-funnel: oklch(0.811 0.111 293.571);
   --sidebar: oklch(0.205 0 0);
   --sidebar-foreground: oklch(0.985 0 0);
   --sidebar-primary: oklch(0.606 0.25 292.717);

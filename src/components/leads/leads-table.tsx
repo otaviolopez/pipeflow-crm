@@ -18,7 +18,7 @@ import type { Lead } from "@/lib/leads/types";
 
 import { LeadStatusBadge } from "./lead-status-badge";
 
-const COLUMNS = ["Nome", "Empresa", "Status", "Responsável", "Última atividade"];
+const COLUMNS = ["Nome", "Empresa", "Status", "Responsável", "Última atividade", "Criado em"];
 
 export function LeadsTable({
   isLoading,
@@ -122,6 +122,9 @@ export function LeadsTable({
                 {lead.lastActivityAt
                   ? formatRelativeDate(lead.lastActivityAt)
                   : "Nenhuma atividade"}
+              </TableCell>
+              <TableCell className="text-muted-foreground">
+                {formatRelativeDate(lead.createdAt)}
               </TableCell>
             </TableRow>
           ))}

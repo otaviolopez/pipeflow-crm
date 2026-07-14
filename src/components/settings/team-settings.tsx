@@ -66,7 +66,10 @@ export function TeamSettings({
     <div className="flex flex-col gap-4">
       <div className="flex items-start justify-between gap-2">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Equipe</h1>
+          <h1 className="flex items-center gap-2.5 text-2xl font-semibold tracking-tight">
+            <span className="h-6 w-1 rounded-full bg-primary" aria-hidden />
+            Equipe
+          </h1>
           <p className="text-sm text-muted-foreground">
             {members.length}/{FREE_PLAN_MEMBER_LIMIT} colaboradores no plano Free.
           </p>
