@@ -87,9 +87,15 @@ sem aprovação explícita do time.
    justamente o excesso que torna o HubSpot complexo para PMEs; mantém o produto
    focado em vendas.
 
-❌ **Integrações externas prontas** (Zapier, Google Contacts, WhatsApp Business API,
+❌ **Integrações externas prontas** (Zapier, Google Contacts,
    outros CRMs) — a API própria fica disponível como fundação (ver Seção 3 do
    escopo de features), mas sem conectores de terceiros construídos no MVP.
+
+   *Atualizado 2026-07-14:* WhatsApp Business API e sync de e-mail (Gmail/
+   Outlook) **saíram desta lista de Non-Goals** — ver `Docs/pesquisa-central-
+   comunicacao.md` para a pesquisa que embasa essa mudança e a Fase 4
+   (M16-M19) do `plan.md` para o plano de implementação. Continuam fora do
+   MVP: Zapier, Google Contacts e integração com outros CRMs.
 
 ❌ **Automações de pipeline** (mover deal automaticamente por regra, triggers,
    workflows) — candidato de roadmap pós-launch, ver Seção 15.

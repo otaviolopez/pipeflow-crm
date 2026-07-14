@@ -357,3 +357,112 @@ externas configuradas para o ambiente real — Seção 8 do PRD.
       membro → upgrade Stripe
 
 **Commit final:** `chore: deploy de produção na Vercel`
+
+---
+
+## Fase 4 — Central de Comunicação
+
+> Adicionada em 2026-07-14, com base em `Docs/pesquisa-central-comunicacao.md`.
+> Começa **depois do M15**: o MVP validado e em produção vem primeiro; a
+> central de comunicação é a próxima onda de valor, não um bloqueador do
+> lançamento. WhatsApp deixou de ser "diferencial" e passou a ser requisito
+> de mercado no Brasil (RD Station, Agendor, Ploomes, PipeRun e Moskit já
+> têm a integração) — a aposta de diferenciação do PiperFlow aqui é
+> qualidade de API oficial vs. o modelo frágil de extensão de navegador
+> usado pela maioria dos concorrentes.
+
+### M16 — Sync de e-mail (Gmail + Outlook)
+
+**Branch:** `feature/comms-email-sync`
+
+**Objetivo:** capturar automaticamente e-mails trocados com um lead como
+`Activity`, sem digitação manual — usando as APIs gratuitas do Gmail e do
+Microsoft Graph em modo de teste (sem custo, sem revisão do Google/Microsoft
+necessária até 100 usuários de teste).
+
+**Entregas:**
+- [ ] App OAuth do Gmail em modo "Testing" (até 100 usuários de teste, sem
+      necessidade de aprovação do Google)
+- [ ] App OAuth do Microsoft Graph / Outlook (Azure AD, Basic Auth não é mais
+      suportado)
+- [ ] Fluxo de conexão de conta de e-mail em `/settings` por usuário
+- [ ] Job de sync capturando e-mails trocados com o e-mail de um lead
+      existente e criando `Activity` automaticamente
+- [ ] Tratamento de token expirado/revogado com reconexão clara na UI
+- [ ] Teste end-to-end com conta de e-mail descartável (sem volume real)
+
+**Commit final:** `feat(comms): sync automático de e-mail via Gmail e Outlook`
+
+---
+
+### M17 — WhatsApp (modo teste)
+
+**Branch:** `feature/comms-whatsapp-test`
+
+**Objetivo:** integrar o WhatsApp Business Platform usando o número de teste
+gratuito da Meta (5 destinatários, sem verificação de negócio), mapeando
+mensagens recebidas para o lead correspondente.
+
+**Entregas:**
+- [ ] Número de teste da Meta configurado (WhatsApp Cloud API)
+- [ ] Webhook recebendo mensagens, com verificação de assinatura (mesma
+      disciplina do webhook do Stripe — Seção de segurança do CLAUDE.md)
+- [ ] Mapeamento de número de telefone → lead existente
+- [ ] Criação automática de `Activity` a partir de mensagens recebidas
+- [ ] Envio de mensagem pelo sistema dentro da janela de 24h (Customer
+      Service Window), respeitando o limite de 5 destinatários do modo teste
+- [ ] Teste end-to-end com número de teste próprio
+
+**Commit final:** `feat(comms): integração WhatsApp Cloud API em modo teste`
+
+---
+
+### M18 — Decisão de produção (custo e precificação)
+
+**Branch:** `docs/decisao-producao-comunicacao`
+
+**Objetivo:** decidir e documentar o modelo de custo para levar e-mail e
+WhatsApp a produção, incorporando a mudança de cobrança da Meta confirmada
+para **1º de outubro de 2026** (mensagens de serviço e templates utilitários
+dentro da CSW deixam de ser gratuitos; tarifa exata publicada até
+1º de setembro de 2026; referência atual no Brasil ≈ R$0,04–0,05/mensagem
+utilitária, sem desconto por volume).
+
+**Entregas:**
+- [ ] Estimativa de custo de verificação de negócio na Meta (Business
+      Verification) para sair do modo teste
+- [ ] Estimativa de custo de revisão do app OAuth do Google (se necessário
+      acima de 100 usuários de teste)
+- [ ] Modelo de precificação por cota (proposta: Free com cota pequena
+      incluída; Pro com cota maior embutida nos R$49, excedente transparente
+      além da cota) documentado e validado contra a Seção de planos do PRD
+- [ ] Registro explícito de quem paga o excedente (PiperFlow absorve até a
+      cota, repassa depois) e por quê, para não inviabilizar o uso por
+      autônomos
+- [ ] Atualização da Seção 6.3 / Riscos do PRD com a decisão final
+
+**Commit final:** `docs: decisão de precificação para WhatsApp e e-mail em produção`
+
+---
+
+### M19 — Assistente de IA para escrita/tom de mensagem
+
+**Branch:** `feature/comms-ai-tone-assistant`
+
+**Objetivo:** ajudar o usuário a melhorar o texto de mensagens (WhatsApp/
+e-mail) mantendo o estilo de comunicação dele, com revisão humana obrigatória
+antes do envio.
+
+**Entregas:**
+- [ ] Captura do perfil de estilo do usuário (questionário manual inicial;
+      avaliar depois derivação automática a partir do histórico de mensagens
+      do M16/M17)
+- [ ] Botão "Melhorar texto" no compositor de mensagem, chamando LLM
+      (Claude Haiku — custo estimado ≈ R$0,005–0,006 por reescrita)
+- [ ] Texto reescrito sempre aberto para edição do usuário antes de enviar —
+      nunca envio automático do resultado da IA
+- [ ] Rate limit / cota de reescritas por plano (mesma lógica de
+      revalidação server-side de limites já usada no restante do produto)
+- [ ] Teste end-to-end: reescrita, edição manual e envio
+
+**Commit final:** `feat(comms): assistente de IA para melhorar tom de mensagem`
