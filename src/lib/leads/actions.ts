@@ -3,6 +3,7 @@
 import { randomUUID } from "node:crypto";
 import { revalidatePath } from "next/cache";
 
+import { canAddLead } from "@/lib/limits";
 import { createClient } from "@/lib/supabase/server";
 import { getActiveWorkspace, getUserWorkspaces } from "@/lib/workspace/session";
 
@@ -37,15 +38,8 @@ export async function createLead(input: {
 
   // Limite do plano Free re-checado no servidor (CLAUDE.md) — nunca confiar
   // só no banner exibido no frontend.
-  if (workspace.plan === "free") {
-    const { count } = await supabase
-      .from("leads")
-      .select("id", { count: "exact", head: true })
-      .eq("workspace_id", workspace.id);
-
-    if ((count ?? 0) >= FREE_PLAN_LEAD_LIMIT) {
-      return { error: `Limite de ${FREE_PLAN_LEAD_LIMIT} leads do plano Free atingido.` };
-    }
+  if (!(await canAddLead(supabase, workspace.id, workspace.plan))) {
+    return { error: `Limite de ${FREE_PLAN_LEAD_LIMIT} leads do plano Free atingido.` };
   }
 
   // Gera o id no servidor e insere sem RETURNING de propósito, mesmo não

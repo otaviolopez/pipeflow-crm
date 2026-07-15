@@ -3,6 +3,7 @@
 import * as React from "react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { Check } from "lucide-react";
 import { toast } from "sonner";
 
 import { Badge } from "@/components/ui/badge";
@@ -139,6 +140,17 @@ export function BillingSettings({
         </CardContent>
       </Card>
 
+      {plan === "free" && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-sm">Free vs. Pro</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <PlanComparisonTable />
+          </CardContent>
+        </Card>
+      )}
+
       <CancelSubscriptionDialog
         open={isCancelOpen}
         onOpenChange={setIsCancelOpen}
@@ -146,6 +158,32 @@ export function BillingSettings({
         onConfirm={handleCancelConfirm}
         isPending={isCancelling}
       />
+    </div>
+  );
+}
+
+const COMPARISON_ROWS: { label: string; free: string; pro: string }[] = [
+  { label: "Colaboradores", free: `Até ${FREE_PLAN_MEMBER_LIMIT}`, pro: "Ilimitados" },
+  { label: "Leads", free: `Até ${FREE_PLAN_LEAD_LIMIT}`, pro: "Ilimitados" },
+  { label: "Preço", free: "R$ 0/mês", pro: PRO_PLAN_PRICE_LABEL },
+];
+
+function PlanComparisonTable() {
+  return (
+    <div className="grid grid-cols-3 gap-y-3 text-sm">
+      <span className="text-muted-foreground" />
+      <span className="font-medium">Free</span>
+      <span className="font-medium">Pro</span>
+      {COMPARISON_ROWS.map((row) => (
+        <React.Fragment key={row.label}>
+          <span className="text-muted-foreground">{row.label}</span>
+          <span>{row.free}</span>
+          <span className="flex items-center gap-1.5">
+            <Check className="size-4 shrink-0 text-primary" aria-hidden />
+            {row.pro}
+          </span>
+        </React.Fragment>
+      ))}
     </div>
   );
 }

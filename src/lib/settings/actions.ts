@@ -5,6 +5,7 @@ import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { Resend } from "resend";
 
+import { canAddMember } from "@/lib/limits";
 import { createClient } from "@/lib/supabase/server";
 import { stripe } from "@/lib/stripe/client";
 import { getActiveWorkspace, getUserWorkspaces } from "@/lib/workspace/session";
@@ -45,29 +46,13 @@ export async function createInvite(input: { email: string; role: MemberRole }) {
     return { error: "Sessão expirada. Faça login novamente." };
   }
 
-  // Limite do Free conta membros atuais + convites pendentes (um convite
-  // aceito vira membro) — o aceite (accept_invite, RPC) reconfirma esse
-  // mesmo limite de novo, para o caso do workspace ganhar membros enquanto
-  // o convite ainda está pendente (CLAUDE.md: limite sempre no servidor).
-  if (workspace.plan === "free") {
-    const [{ count: memberCount }, { count: inviteCount }] = await Promise.all([
-      supabase
-        .from("workspace_members")
-        .select("id", { count: "exact", head: true })
-        .eq("workspace_id", workspace.id),
-      supabase
-        .from("invites")
-        .select("id", { count: "exact", head: true })
-        .eq("workspace_id", workspace.id)
-        .is("accepted_at", null)
-        .gt("expires_at", new Date().toISOString()),
-    ]);
-
-    if ((memberCount ?? 0) + (inviteCount ?? 0) >= FREE_PLAN_MEMBER_LIMIT) {
-      return {
-        error: `Limite de ${FREE_PLAN_MEMBER_LIMIT} colaboradores do plano Free atingido.`,
-      };
-    }
+  // O aceite (accept_invite, RPC) reconfirma esse mesmo limite de novo, para
+  // o caso do workspace ganhar membros enquanto o convite ainda está
+  // pendente (CLAUDE.md: limite sempre no servidor).
+  if (!(await canAddMember(supabase, workspace.id, workspace.plan))) {
+    return {
+      error: `Limite de ${FREE_PLAN_MEMBER_LIMIT} colaboradores do plano Free atingido.`,
+    };
   }
 
   const { count: duplicateCount } = await supabase

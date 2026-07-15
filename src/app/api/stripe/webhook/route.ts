@@ -85,6 +85,15 @@ export async function POST(request: Request) {
       break;
     }
 
+    case "invoice.payment_failed": {
+      // Não rebaixa o plano aqui: o Stripe já tenta cobrar de novo (dunning)
+      // e só emite customer.subscription.deleted se todas as tentativas
+      // falharem — é esse evento, já tratado acima, que de fato volta pro
+      // Free. O aviso ao usuário é feito pelo próprio Stripe (e-mail de
+      // fatura falhada); aqui só confirmamos o recebimento do evento.
+      break;
+    }
+
     default:
       break;
   }
