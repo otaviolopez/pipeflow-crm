@@ -8,3 +8,4 @@ Formato Michael Nygard — ver skill `architecture-decision-records`.
 |---|---|---|
 | [0001](0001-status-do-lead-independente-da-etapa-do-negocio.md) | Status do lead independente da etapa do negócio | Aceito |
 | [0002](0002-estrategia-de-chave-primaria-adiada.md) | Estratégia de chave primária adiada | Proposto |
+| [0003](0003-tratamento-diferenciado-de-falha-ativa-vs-hardening.md) | Tratamento diferenciado: falha ativa vs. hardening de configuração | Aceito |

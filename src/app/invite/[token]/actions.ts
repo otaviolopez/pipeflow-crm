@@ -2,9 +2,21 @@
 
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
+import { isAuthWeakPasswordError } from "@supabase/supabase-js";
 
 import { createClient } from "@/lib/supabase/server";
 import { acceptInviteForCurrentUser } from "@/lib/workspace/invites";
+
+// Mesma checagem de src/app/signup/actions.ts — ver comentário lá.
+function friendlySignupError(error: unknown, fallback: string): string {
+  if (isAuthWeakPasswordError(error)) {
+    if (error.reasons.includes("pwned")) {
+      return "Por segurança, não aceitamos senhas que já apareceram em vazamentos de dados conhecidos. Escolha uma senha diferente das que você já usou em outros sites.";
+    }
+    return "Senha muito fraca. Use uma senha mais longa e com uma mistura de letras, números e símbolos.";
+  }
+  return error instanceof Error ? error.message : fallback;
+}
 
 export async function loginAndAcceptInvite(token: string, formData: FormData) {
   const supabase = await createClient();
@@ -47,7 +59,7 @@ export async function signupAndAcceptInvite(token: string, formData: FormData) {
   });
 
   if (signUpError) {
-    return { error: signUpError.message };
+    return { error: friendlySignupError(signUpError, signUpError.message) };
   }
 
   if (!data.session) {

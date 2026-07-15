@@ -2,7 +2,24 @@
 
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
+import { isAuthWeakPasswordError } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
+
+// Supabase Auth rejeita a senha e devolve reasons: ["pwned"] quando ela já
+// apareceu em um vazamento de dados conhecido (checagem contra a base do
+// HaveIBeenPwned — Authentication > Policies no Supabase Studio). A mensagem
+// padrão do SDK vem em inglês e genérica demais; aqui trocamos por uma
+// explicação específica do motivo, em vez de deixar o usuário achar que
+// digitou a senha errada ou que ela é curta demais.
+function friendlySignupError(error: unknown, fallback: string): string {
+  if (isAuthWeakPasswordError(error)) {
+    if (error.reasons.includes("pwned")) {
+      return "Por segurança, não aceitamos senhas que já apareceram em vazamentos de dados conhecidos. Escolha uma senha diferente das que você já usou em outros sites.";
+    }
+    return "Senha muito fraca. Use uma senha mais longa e com uma mistura de letras, números e símbolos.";
+  }
+  return error instanceof Error ? error.message : fallback;
+}
 
 export async function signup(formData: FormData) {
   const name = (formData.get("name") as string).trim();
@@ -31,7 +48,7 @@ export async function signup(formData: FormData) {
   });
 
   if (error) {
-    redirect(`/signup?error=${encodeURIComponent(error.message)}`);
+    redirect(`/signup?error=${encodeURIComponent(friendlySignupError(error, error.message))}`);
   }
 
   revalidatePath("/", "layout");
