@@ -133,7 +133,7 @@ export function BillingSettings({
                 disabled={isRedirecting}
                 onClick={() => redirectTo("portal")}
               >
-                {isRedirecting ? "Redirecionando..." : "Ver faturas e forma de pagamento"}
+                {isRedirecting ? "Redirecionando..." : "Gerenciar Assinatura"}
               </Button>
             </>
           )}
@@ -141,14 +141,10 @@ export function BillingSettings({
       </Card>
 
       {plan === "free" && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-sm">Free vs. Pro</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <PlanComparisonTable />
-          </CardContent>
-        </Card>
+        <div>
+          <h2 className="mb-3 text-base font-semibold tracking-tight">Compare os planos</h2>
+          <PlanComparisonCards isRedirecting={isRedirecting} onUpgrade={() => redirectTo("checkout")} />
+        </div>
       )}
 
       <CancelSubscriptionDialog
@@ -162,29 +158,75 @@ export function BillingSettings({
   );
 }
 
-const COMPARISON_ROWS: { label: string; free: string; pro: string }[] = [
-  { label: "Colaboradores", free: `Até ${FREE_PLAN_MEMBER_LIMIT}`, pro: "Ilimitados" },
-  { label: "Leads", free: `Até ${FREE_PLAN_LEAD_LIMIT}`, pro: "Ilimitados" },
-  { label: "Preço", free: "R$ 0/mês", pro: PRO_PLAN_PRICE_LABEL },
+const FREE_FEATURES = [
+  `Até ${FREE_PLAN_MEMBER_LIMIT} membros da equipe`,
+  `Até ${FREE_PLAN_LEAD_LIMIT} leads`,
+  "Pipeline Kanban",
+  "Dashboard de métricas",
+  "Convites por e-mail",
 ];
 
-function PlanComparisonTable() {
+const PRO_FEATURES = [
+  "Membros da equipe ilimitados",
+  "Leads ilimitados",
+  "Pipeline Kanban",
+  "Dashboard de métricas",
+  "Convites por e-mail",
+];
+
+function PlanComparisonCards({
+  isRedirecting,
+  onUpgrade,
+}: {
+  isRedirecting: boolean;
+  onUpgrade: () => void;
+}) {
   return (
-    <div className="grid grid-cols-3 gap-y-3 text-sm">
-      <span className="text-muted-foreground" />
-      <span className="font-medium">Free</span>
-      <span className="font-medium">Pro</span>
-      {COMPARISON_ROWS.map((row) => (
-        <React.Fragment key={row.label}>
-          <span className="text-muted-foreground">{row.label}</span>
-          <span>{row.free}</span>
-          <span className="flex items-center gap-1.5">
-            <Check className="size-4 shrink-0 text-primary" aria-hidden />
-            {row.pro}
-          </span>
-        </React.Fragment>
-      ))}
+    <div className="grid gap-4 sm:grid-cols-2">
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base font-semibold">Free</CardTitle>
+          <p className="text-2xl font-semibold tracking-tight">
+            R$ 0<span className="text-sm font-normal text-muted-foreground">/mês</span>
+          </p>
+          <p className="text-sm text-muted-foreground">Para freelancers começando</p>
+        </CardHeader>
+        <CardContent>
+          <FeatureList features={FREE_FEATURES} />
+        </CardContent>
+      </Card>
+
+      <Card className="relative border-primary">
+        <Badge className="absolute right-4 top-4">Recomendado</Badge>
+        <CardHeader>
+          <CardTitle className="text-base font-semibold">Pro</CardTitle>
+          <p className="text-2xl font-semibold tracking-tight">{PRO_PLAN_PRICE_LABEL}</p>
+          <p className="text-sm text-muted-foreground">Para equipes em crescimento</p>
+        </CardHeader>
+        <CardContent className="flex flex-col gap-4">
+          <FeatureList features={PRO_FEATURES} highlight />
+          <Button className="w-full" disabled={isRedirecting} onClick={onUpgrade}>
+            {isRedirecting ? "Redirecionando..." : `Assinar Pro — ${PRO_PLAN_PRICE_LABEL}`}
+          </Button>
+        </CardContent>
+      </Card>
     </div>
+  );
+}
+
+function FeatureList({ features, highlight }: { features: string[]; highlight?: boolean }) {
+  return (
+    <ul className="flex flex-col gap-2 text-sm">
+      {features.map((feature) => (
+        <li key={feature} className="flex items-center gap-2">
+          <Check
+            className={`size-4 shrink-0 ${highlight ? "text-primary" : "text-muted-foreground"}`}
+            aria-hidden
+          />
+          {feature}
+        </li>
+      ))}
+    </ul>
   );
 }
 
