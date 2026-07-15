@@ -225,15 +225,17 @@ export function PipelineBoard({
         </h1>
       </div>
 
-      {/* fixed (não sticky/relative): fica ancorado no canto superior
+      {/* sm+: fixed (não sticky/relative), ancorado no canto superior
           direito da tela o tempo todo, mesmo se a página ganhar scroll
           vertical — não faz parte do fluxo normal do header. top-20 (abaixo
           da topbar de 56px + folga) evita sobrepor o dropdown de
-          avatar/tema que já vive lá. */}
+          avatar/tema que já vive lá. Abaixo de sm (≤375px) não há espaço
+          horizontal pro botão flutuar ao lado do título sem sobrepor —
+          volta a fazer parte do fluxo normal, abaixo do título. */}
       <Button
         onClick={() => setIsNewDealOpen(true)}
         disabled={isLoading}
-        className="fixed top-20 right-6 z-40 shadow-lg"
+        className="w-fit sm:fixed sm:top-20 sm:right-6 sm:z-40 sm:shadow-lg"
       >
         <Plus />
         Novo negócio

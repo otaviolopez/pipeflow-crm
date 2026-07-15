@@ -17,6 +17,7 @@ import { formatRelativeDate } from "@/lib/leads/format";
 import type { Lead } from "@/lib/leads/types";
 
 import { LeadStatusBadge } from "./lead-status-badge";
+import { TableScrollFade } from "./table-scroll-fade";
 
 const COLUMNS = ["Nome", "Empresa", "Status", "Responsável", "Última atividade", "Criado em"];
 
@@ -36,26 +37,28 @@ export function LeadsTable({
   if (isLoading) {
     return (
       <div className="rounded-xl border border-primary/20">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              {COLUMNS.map((column) => (
-                <TableHead key={column}>{column}</TableHead>
-              ))}
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {Array.from({ length: 8 }).map((_, index) => (
-              <TableRow key={index}>
+        <TableScrollFade>
+          <Table>
+            <TableHeader>
+              <TableRow>
                 {COLUMNS.map((column) => (
-                  <TableCell key={column}>
-                    <Skeleton className="h-4 w-24" />
-                  </TableCell>
+                  <TableHead key={column}>{column}</TableHead>
                 ))}
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {Array.from({ length: 8 }).map((_, index) => (
+                <TableRow key={index}>
+                  {COLUMNS.map((column) => (
+                    <TableCell key={column}>
+                      <Skeleton className="h-4 w-24" />
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableScrollFade>
       </div>
     );
   }
@@ -97,39 +100,41 @@ export function LeadsTable({
 
   return (
     <div className="rounded-xl border border-primary/20">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            {COLUMNS.map((column) => (
-              <TableHead key={column}>{column}</TableHead>
-            ))}
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {leads.map((lead) => (
-            <TableRow key={lead.id}>
-              <TableCell>
-                <Link href={`/leads/${lead.id}`} className="font-medium hover:underline">
-                  {lead.name}
-                </Link>
-              </TableCell>
-              <TableCell className="text-muted-foreground">{lead.company ?? "—"}</TableCell>
-              <TableCell>
-                <LeadStatusBadge status={lead.status} />
-              </TableCell>
-              <TableCell className="text-muted-foreground">{lead.ownerName}</TableCell>
-              <TableCell className="text-muted-foreground">
-                {lead.lastActivityAt
-                  ? formatRelativeDate(lead.lastActivityAt)
-                  : "Nenhuma atividade"}
-              </TableCell>
-              <TableCell className="text-muted-foreground">
-                {formatRelativeDate(lead.createdAt)}
-              </TableCell>
+      <TableScrollFade>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              {COLUMNS.map((column) => (
+                <TableHead key={column}>{column}</TableHead>
+              ))}
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+          </TableHeader>
+          <TableBody>
+            {leads.map((lead) => (
+              <TableRow key={lead.id}>
+                <TableCell>
+                  <Link href={`/leads/${lead.id}`} className="font-medium hover:underline">
+                    {lead.name}
+                  </Link>
+                </TableCell>
+                <TableCell className="text-muted-foreground">{lead.company ?? "—"}</TableCell>
+                <TableCell>
+                  <LeadStatusBadge status={lead.status} />
+                </TableCell>
+                <TableCell className="text-muted-foreground">{lead.ownerName}</TableCell>
+                <TableCell className="text-muted-foreground">
+                  {lead.lastActivityAt
+                    ? formatRelativeDate(lead.lastActivityAt)
+                    : "Nenhuma atividade"}
+                </TableCell>
+                <TableCell className="text-muted-foreground">
+                  {formatRelativeDate(lead.createdAt)}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableScrollFade>
     </div>
   );
 }
