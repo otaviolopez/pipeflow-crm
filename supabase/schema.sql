@@ -294,6 +294,7 @@ declare
   _invite public.invites;
   _workspace_plan text;
   _member_count integer;
+  _current_user_email text;
 begin
   select *
   into _invite
@@ -304,6 +305,19 @@ begin
 
   if not found then
     raise exception 'Convite inválido ou expirado.';
+  end if;
+
+  -- Auditoria de segurança (aula 5.1): sem esta checagem, qualquer usuário
+  -- autenticado com QUALQUER e-mail podia aceitar um convite que vazasse
+  -- (print, link encaminhado por engano), virando membro — ou admin — de um
+  -- workspace ao qual nunca deveria ter acesso. O convite pertence ao
+  -- e-mail para o qual foi endereçado, não a quem quer que tenha o token.
+  select email into _current_user_email
+  from auth.users
+  where id = auth.uid();
+
+  if lower(_current_user_email) <> lower(_invite.email) then
+    raise exception 'Este convite foi enviado para outro e-mail.';
   end if;
 
   -- Re-checa o limite de 2 colaboradores do Free aqui também (não só na
