@@ -30,38 +30,23 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarMenuSub,
-  SidebarMenuSubButton,
-  SidebarMenuSubItem,
   SidebarRail,
 } from "@/components/ui/sidebar"
 import { switchWorkspace } from "@/lib/workspace/actions"
-import type { WorkspaceRole, WorkspaceSummary } from "@/lib/workspace/session"
+import type { WorkspaceSummary } from "@/lib/workspace/session"
 
 const mainNav = [
-  { title: "Pipeline", href: "/pipeline", icon: SquareKanban },
-  { title: "Leads", href: "/leads", icon: Users },
   { title: "Dashboard", href: "/dashboard", icon: ChartLine },
-]
-
-// "Workspace" e "Equipe" são admin-only (PRD 6.5: gerenciar membros/dados do
-// workspace); "Plano" fica de fora do filtro porque qualquer membro pode
-// consultar o uso/plano atual (RLS "workspaces: select as member" já
-// permite leitura pra todo mundo).
-const settingsNav = [
-  { title: "Workspace", href: "/settings/workspace", adminOnly: true },
-  { title: "Equipe", href: "/settings/team", adminOnly: true },
-  { title: "Plano", href: "/settings/billing", adminOnly: false },
+  { title: "Leads", href: "/leads", icon: Users },
+  { title: "Pipeline", href: "/pipeline", icon: SquareKanban },
 ]
 
 export function AppSidebar({
   workspaces,
   activeWorkspaceId,
-  currentUserRole,
 }: {
   workspaces: WorkspaceSummary[]
   activeWorkspaceId: string
-  currentUserRole: WorkspaceRole | null
 }) {
   const pathname = usePathname()
   const [isPending, startTransition] = React.useTransition()
@@ -165,20 +150,6 @@ export function AppSidebar({
                   <Settings />
                   <span>Configurações</span>
                 </SidebarMenuButton>
-                <SidebarMenuSub>
-                  {settingsNav
-                    .filter((item) => !item.adminOnly || currentUserRole === "admin")
-                    .map((item) => (
-                      <SidebarMenuSubItem key={item.href}>
-                        <SidebarMenuSubButton
-                          render={<Link href={item.href} />}
-                          isActive={pathname === item.href}
-                        >
-                          <span>{item.title}</span>
-                        </SidebarMenuSubButton>
-                      </SidebarMenuSubItem>
-                    ))}
-                </SidebarMenuSub>
               </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>

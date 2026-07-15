@@ -2,11 +2,7 @@ import { redirect } from "next/navigation";
 
 import { createClient } from "@/lib/supabase/server";
 import { AppShell } from "@/components/app-shell";
-import {
-  getActiveWorkspace,
-  getCurrentUserRole,
-  getUserWorkspaces,
-} from "@/lib/workspace/session";
+import { getActiveWorkspace, getUserWorkspaces } from "@/lib/workspace/session";
 
 // Route group (app): agrupa /pipeline, /leads, /dashboard e /settings/* sob o
 // mesmo shell (sidebar + topbar) sem afetar as URLs. A proteção de sessão
@@ -30,14 +26,12 @@ export default async function AppLayout({
   }
 
   const activeWorkspace = await getActiveWorkspace(workspaces);
-  const currentUserRole = await getCurrentUserRole(activeWorkspace!.id);
 
   return (
     <AppShell
       userEmail={userEmail}
       workspaces={workspaces}
       activeWorkspaceId={activeWorkspace!.id}
-      currentUserRole={currentUserRole}
     >
       {children}
     </AppShell>

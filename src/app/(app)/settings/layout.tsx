@@ -1,5 +1,7 @@
-// Container estreito e consistente para as 4 telas de /settings/* — o
-// shell (sidebar/topbar) já vem do layout do grupo (app).
+// Container estreito e consistente para todas as telas de /settings/* —
+// inclui a tela de Perfil (acessada pelo dropdown do avatar na topbar, fora
+// das abas) além das 3 telas administrativas em (with-tabs). O shell
+// (sidebar/topbar) já vem do layout do grupo (app).
 export default function SettingsLayout({
   children,
 }: {

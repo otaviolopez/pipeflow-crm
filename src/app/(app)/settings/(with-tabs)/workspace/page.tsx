@@ -16,18 +16,5 @@ export default async function SettingsWorkspacePage() {
 
   const currentUserRole = await getCurrentUserRole(workspace.id);
 
-  return (
-    <div className="flex flex-col gap-4">
-      <div>
-        <h1 className="flex items-center gap-2.5 text-2xl font-semibold tracking-tight">
-          <span className="h-6 w-1 rounded-full bg-primary" aria-hidden />
-          Workspace
-        </h1>
-        <p className="text-sm text-muted-foreground">
-          Nome e dados gerais do workspace atual.
-        </p>
-      </div>
-      <WorkspaceSettingsForm name={workspace.name} currentUserRole={currentUserRole} />
-    </div>
-  );
+  return <WorkspaceSettingsForm name={workspace.name} currentUserRole={currentUserRole} />;
 }
